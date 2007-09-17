@@ -12,10 +12,6 @@ Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 It can set that if count the registered member views OR views in index page.
 To differentiate between USER and BOT is by HTTP_agent, and it can set at admin
 
-== Development Blog ==
-
-[Fantasyworld Blog of WP_PostViews Plus](http://fantasyworld.idv.tw/programs/wp_postviews_plus "Fantasyworld Blog of WP_PostViews Plus")
-
 == Installation ==
 
 [WP_PostViews Plus Readme](http://fantasyworld.idv.tw/programs/wp_postviews_plus "WP_PostViews Plus Readme") (Installation Tab)
