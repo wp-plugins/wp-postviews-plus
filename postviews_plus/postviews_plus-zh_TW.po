@@ -1,0 +1,121 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WP-PostViews Plus 1.0.12\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-10-14 15:59+0800\n"
+"Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
+"Language-Team:  <fantasyworldidvtw@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: ./../fantasyworld.idv.tw/wp-content/plugins/postviews_plus\n"
+"X-Poedit-Country: TAIWAN\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: postviews_plus.php:151
+#: postviews_plus.php:192
+#: postviews_plus.php:231
+#: postviews_plus.php:272
+msgid "N/A"
+msgstr "沒有文章"
+
+#: postviews_plus.php:218
+#: postviews_plus.php:259
+msgid "Views"
+msgstr "瀏覽數"
+
+#: postviews_plus.php:221
+#: postviews_plus.php:262
+msgid "User Views"
+msgstr "使用者瀏覽數"
+
+#: postviews_plus.php:350
+msgid "Update Option Success"
+msgstr "成功的更新設定"
+
+#: postviews_plus.php:355
+msgid "Reset Options Success"
+msgstr "成功的重置設定"
+
+#: postviews_plus.php:359
+msgid "Reset Post View Timws Success"
+msgstr "成功的重置瀏覽數"
+
+#: postviews_plus.php:363
+msgid "Cleared User User_agent Success"
+msgstr "成功的清除使用者的User_agent"
+
+#: postviews_plus.php:368
+msgid "Update BOT User_agent Success"
+msgstr "成功的更新機器人的User_agent"
+
+#: postviews_plus.php:377
+msgid "Report BOT User_agent Success"
+msgstr "成功的回報機器人的User_agent"
+
+#: postviews_plus.php:379
+msgid "Report BOT User_agent Fail"
+msgstr "失敗的回報機器人的User_agent"
+
+#: postviews_plus.php:386
+msgid "Reset Bot User_agent Success"
+msgstr "成功的重置機器人的User_agent"
+
+#: postviews_plus.php:397
+msgid "Options"
+msgstr "設定"
+
+#: postviews_plus.php:397
+msgid "Update Options"
+msgstr "更新設定"
+
+#: postviews_plus.php:397
+msgid "Reset Option"
+msgstr "重置設定"
+
+#: postviews_plus.php:397
+msgid "Reset Post Views"
+msgstr "重置瀏覽數"
+
+#: postviews_plus.php:398
+msgid "Remember the User_agent Of User."
+msgstr "記住訪客的User_agent."
+
+#: postviews_plus.php:399
+msgid "Add Views number if User is logoin."
+msgstr "當使用者登入後也計算文章閱覽數."
+
+#: postviews_plus.php:400
+msgid "Add Views number in Blog Index Page."
+msgstr "在部落格首頁的閱覽計算在文章閱覽數內."
+
+#: postviews_plus.php:401
+msgid "Report BOT User_agent when update."
+msgstr "在更新機器人的User_agent之時回報"
+
+#: postviews_plus.php:403
+msgid "User User_agent"
+msgstr "使用者的User_agent"
+
+#: postviews_plus.php:403
+msgid "Clear User User_agent record"
+msgstr "清除使用者的User_agent紀錄"
+
+#: postviews_plus.php:406
+msgid "Bot User_agent"
+msgstr "機器人的User_agent"
+
+#: postviews_plus.php:406
+msgid "Update BOT User_agent"
+msgstr "更新機器人的User_agent"
+
+#: postviews_plus.php:406
+msgid "Reset BOT User_agent"
+msgstr "重置機器人的User_agent"
+
+#: postviews_plus.php:407
+msgid "Here are a list of Bot User_agent. Start each User_agent on a new line."
+msgstr "這是監測機器人所使用的User_agent的清單.每一個User_agent在一行."
+
