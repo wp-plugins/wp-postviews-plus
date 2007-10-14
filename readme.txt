@@ -19,4 +19,4 @@ To differentiate between USER and BOT is by HTTP_agent, and it can set at admin
 
 == Frequently Asked Questions ==
 
-Please visit the plugin page at (http://fantasyworld.idv.tw/programs/wp_postviews_plus) with any questions.
+Please visit the plugin page at [http://fantasyworld.idv.tw/programs/wp_postviews_plus](http://fantasyworld.idv.tw/programs/wp_postviews_plus "") with any questions.
