@@ -2,7 +2,7 @@
 Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
 Requires at least: 2.3
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 
 Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
@@ -19,4 +19,4 @@ To differentiate between USER and BOT is by HTTP_agent, and it can set at admin
 
 == Frequently Asked Questions ==
 
-Please visit the [plugin page](http://fantasyworld.idv.tw/programs/wp_postviews_plus "") with any questions.
+Please visit the [plugin page](http://fantasyworld.idv.tw/programs/wp_postviews_plus " ") with any questions.
