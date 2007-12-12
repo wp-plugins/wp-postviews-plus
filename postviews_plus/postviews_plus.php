@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.1
+Version: 1.1.2
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -136,7 +136,7 @@ if( !function_exists('get_most_viewed') ) {
 		if( $most_viewed ) {
 			$output = '';
 			foreach($most_viewed as $post) {
-				$post_title = htmlspecialchars(stripslashes($post->post_title));
+				$post_title = $post->post_title;
 				$post_views = number_format(intval($post->views));
 				$link = '<a href="'.get_permalink().'">'.snippet_chars($post_title, $chars).'</a>';
 				$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
@@ -179,7 +179,7 @@ if(!function_exists('get_most_viewed_category')) {
 		if( $most_viewed ) {
 			$output = '';
 			foreach ($most_viewed as $post) {
-				$post_title = htmlspecialchars(stripslashes($post->post_title));
+				$post_title = $post->post_title;
 				$post_views = number_format(intval($post->views));
 				$link = '<a href="'.get_permalink().'">'.snippet_chars($post_title, $chars).'</a>';
 				$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
@@ -220,7 +220,7 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 	if( $most_viewed ) {
 		$output = '';
 		foreach($most_viewed as $post) {
-			$post_title = htmlspecialchars(stripslashes($post->post_title));
+			$post_title = $post->post_title;
 			$post_views = number_format(intval($post->views));
 			$link = '<a href="'.get_permalink().'">'.snippet_chars($post_title, $chars).'</a>';
 			$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
@@ -263,7 +263,7 @@ function get_timespan_most_viewed_cat($category_id=0, $mode='', $limit=10, $days
 	if( $most_viewed ) {
 		$output = '';
 		foreach ($most_viewed as $post) {
-			$post_title = get_the_title();
+			$post_title = $post->post_title;
 			$post_views = number_format(intval($post->views));
 			$link = '<a href="'.get_permalink().'">'.snippet_chars($post_title, $chars).'</a>';
 			$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
@@ -300,11 +300,11 @@ if( !function_exists('snippet_chars') ) {
 	function snippet_chars($text, $length = 0) {
 		mb_internal_encoding(get_bloginfo('charset'));
 		if( $length == 0 ) {
-			return htmlspecialchars($text);
+			return $text;
 		} else if( mb_strlen($text) > $length ) {
-			return htmlspecialchars(mb_substr($text,0,$length)).' ...';
+			return mb_substr($text,0,$length).' ...';
 		} else {
-			return htmlspecialchars($text);
+			return $text;
 		}
 	}
 }
