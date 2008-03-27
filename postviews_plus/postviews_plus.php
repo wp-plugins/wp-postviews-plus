@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.4
+Version: 1.1.5
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -165,13 +165,23 @@ if(!function_exists('get_most_viewed_category')) {
 		} else {
 			$where = '(p.post_type = "post" OR p.post_type = "page")';
 		}
-		if( is_array($category_id) ) {
-			$term_id = 'term_id IN ('.join(',', $category_id).')';
+		if( $category_id=='auto' ) {
+			$category_sql = 'tr.term_taxonomy_id IN (';
+			$category = get_the_category($post->ID);
+			foreach( $category AS $cate )	{
+				$category_sql .= $cate->term_taxonomy_id.',';
+			}
+			$category_sql = substr($category_sql, 0, -1);
+			$category_sql .= ')';
 		} else {
-			$term_id = 'term_id = '.$category_id;
+			if( is_array($category_id) ) {
+				$term_id = 'term_id IN ('.join(',', $category_id).')';
+			} else {
+				$term_id = 'term_id = '.$category_id;
+			}
+			$ttid = $wpdb->get_col("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE $term_id");
+			$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
 		}
-		$ttid = $wpdb->get_col("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE $term_id");
-		$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
 		if( $with_bot ) {
 			$most_viewed = $wpdb->get_results('SELECT p.ID, p.post_title, p.post_name, p.post_status, p.post_date, (CAST(pm1.meta_value AS UNSIGNED) + CAST(pm2.meta_value AS UNSIGNED)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 			$output_format = $output_format['mostviewsbot'];
@@ -239,7 +249,7 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 }
 
 ### Function: Get TimeSpan Most Viewed By Category
-function get_timespan_most_viewed_cat($category_id=0, $mode='', $limit=10, $days=7, $display=true, $with_bot=true, $chars=0) {
+function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days=7, $display=true, $with_bot=true, $chars=0) {
 	global $wpdb, $post;	
 	$limit_date = current_time('timestamp') - ($days*86400);
 	$limit_date = date('Y-m-d H:i:s', $limit_date);
@@ -251,13 +261,23 @@ function get_timespan_most_viewed_cat($category_id=0, $mode='', $limit=10, $days
 	} else {
 		$where = '(p.post_type = "post" OR p.post_type = "page")';
 	}
-	if( is_array($category_id) ) {
-		$term_id = 'term_id IN ('.join(',', $category_id).')';
+	if( $category_id=='auto' ) {
+		$category_sql = 'tr.term_taxonomy_id IN (';
+		$category = get_the_category($post->ID);
+		foreach( $category AS $cate )	{
+			$category_sql .= $cate->term_taxonomy_id.',';
+		}
+		$category_sql = substr($category_sql, 0, -1);
+		$category_sql .= ')';
 	} else {
-		$term_id = 'term_id = '.$category_id;
+		if( is_array($category_id) ) {
+			$term_id = 'term_id IN ('.join(',', $category_id).')';
+		} else {
+			$term_id = 'term_id = '.$category_id;
+		}
+		$ttid = $wpdb->get_col("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE $term_id");
+		$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
 	}
-	$ttid = $wpdb->get_col("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE $term_id");
-	$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
 	if( $with_bot ) {
 		$most_viewed = $wpdb->get_results('SELECT p.ID, p.post_title, p.post_name, p.post_status, p.post_date, (CAST(pm1.meta_value AS UNSIGNED) + CAST(pm2.meta_value AS UNSIGNED)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsbot'];
@@ -380,7 +400,7 @@ function postviews_plus_option_page()
 				$message = $botAgent;
 				$message = str_replace(ARRAY_CAT, "\n", $message);
 				$message .= "\n".'By '.$user_identity.' From '.get_bloginfo('admin_email').' AT '.get_bloginfo('wpurl');
-				if(FALSE != wp_mail('fantasyworldidvtw@gmail.com', 'Postviews+ BOT User_agent Report', $message)) {
+				if(FALSE != wp_mail('fantasyworldidvtw@gmail.com', $user_identity.' Postviews+ BOT User_agent Report', $message)) {
 					$text .= '<font color="green">'.__('Report BOT User_agent Success' ,'postviews_plus').'</font>';
 				} else {
 					$text .= '<font color="red">'.__('Report BOT User_agent Fail' ,'postviews_plus').'</font>';
