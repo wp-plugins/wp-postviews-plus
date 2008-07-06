@@ -71,7 +71,7 @@ function postviews_plus_option_page_25()
 	echo '<input name="userlogoin" type="checkbox" value="1" '.($pv_option['userlogoin']?'checked="checked"':'').'/> '.__('Add Views number if User is logoin.' ,'postviews_plus').'<br />';
 	echo '<input name="indexviews" type="checkbox" value="1" '.($pv_option['indexviews']?'checked="checked"':'').'/> '.__('Add Views number in Blog Index Page.' ,'postviews_plus').'<br />';
 	echo '<input name="reportbot" type="checkbox" value="1" '.($pv_option['reportbot']?'checked="checked"':'').'/> '.__('Report BOT User_agent when update.' ,'postviews_plus').'<br /><br />';
-	echo __('Output format of most views. (%1$s: Post link. %2$s: Views number.)' ,'postviews_plus').'<br /><input name="mostviewsbot" type="text" value="'.$pv_option['mostviewsbot'].'" size="30" />'.__('with bot views.' ,'postviews_plus').'<br />';
+	echo __('Output format of most views. (%1$s: Views number. %2$s: Post link.)' ,'postviews_plus').'<br /><input name="mostviewsbot" type="text" value="'.$pv_option['mostviewsbot'].'" size="30" />'.__('with bot views.' ,'postviews_plus').'<br />';
 	echo '<input name="mostviewsnobot" type="text" value="'.$pv_option['mostviewsnobot'].'" size="30" />'.__('without bot views.' ,'postviews_plus');
 	echo '<p class="submit"><input type="submit" name="update_op" class="button" value="'.__('Update Options' ,'postviews_plus').'" /><input type="submit" name="reset_op" class="button" value="'.__('Reset Option' ,'postviews_plus').'" /><input type="submit" name="reset_pv" class="button" value="'.__('Reset Post Views' ,'postviews_plus').'" /></p>';
 	echo '</td></tr>';
@@ -106,7 +106,7 @@ function postviews_plus_option_page()
 	echo '<input name="userlogoin" type="checkbox" value="1" '.($pv_option['userlogoin']?'checked="checked"':'').'/> '.__('Add Views number if User is logoin.' ,'postviews_plus').'<br />';
 	echo '<input name="indexviews" type="checkbox" value="1" '.($pv_option['indexviews']?'checked="checked"':'').'/> '.__('Add Views number in Blog Index Page.' ,'postviews_plus').'<br />';
 	echo '<input name="reportbot" type="checkbox" value="1" '.($pv_option['reportbot']?'checked="checked"':'').'/> '.__('Report BOT User_agent when update.' ,'postviews_plus').'<br /><br />';
-	echo __('Output format of most views. (%1$s: Post link. %2$s: Views number.)' ,'postviews_plus').'<br /><input name="mostviewsbot" type="text" value="'.$pv_option['mostviewsbot'].'" size="30" />'.__('with bot views.' ,'postviews_plus').'<br />';
+	echo __('Output format of most views. (%1$s: Views number. %2$s: Post link.)' ,'postviews_plus').'<br /><input name="mostviewsbot" type="text" value="'.$pv_option['mostviewsbot'].'" size="30" />'.__('with bot views.' ,'postviews_plus').'<br />';
 	echo '<input name="mostviewsnobot" type="text" value="'.$pv_option['mostviewsnobot'].'" size="30" />'.__('without bot views.' ,'postviews_plus').'<br /></td></tr>';
 	if( $pv_option['getuseragent']==1 ) {
 		echo '<tr valign="top"><th align="left" width="30%">'.__('User User_agent' ,'postviews_plus').'<br /><input type="submit" name="clear_user_ua" class="button" value="'.__('Clear User User_agent record' ,'postviews_plus').'" /></th>';

@@ -1,133 +1,151 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WP-PostViews Plus 1.0.12\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-11-03 23:33+0800\n"
+"Project-Id-Version: WP-PostViews Plus\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-07-06 18:57+0800\n"
+"PO-Revision-Date: 2008-07-06 19:03+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <fantasyworldidvtw@gmail.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
-"X-Poedit-Basepath: ./../fantasyworld.idv.tw/wp-content/plugins/postviews_plus\n"
+"X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: postviews_plus.php:145
-#: postviews_plus.php:188
-#: postviews_plus.php:229
-#: postviews_plus.php:272
+#: postviews_plus.php:152
+#: postviews_plus.php:207
+#: postviews_plus.php:248
+#: postviews_plus.php:303
 msgid "N/A"
 msgstr ""
 
-#: postviews_plus.php:317
-#: postviews_plus.php:355
+#: postviews_plus.php:347
+#: postviews_plus_admin.php:18
 msgid "Views"
 msgstr ""
 
-#: postviews_plus.php:317
-#: postviews_plus.php:355
+#: postviews_plus.php:347
+#: postviews_plus_admin.php:18
 msgid "User Views"
 msgstr ""
 
-#: postviews_plus.php:352
+#: postviews_plus_admin.php:15
 msgid "Update Option Success"
 msgstr ""
 
-#: postviews_plus.php:357
+#: postviews_plus_admin.php:20
 msgid "Reset Options Success"
 msgstr ""
 
-#: postviews_plus.php:361
+#: postviews_plus_admin.php:24
 msgid "Reset Post View Timws Success"
 msgstr ""
 
-#: postviews_plus.php:365
+#: postviews_plus_admin.php:28
 msgid "Cleared User User_agent Success"
 msgstr ""
 
-#: postviews_plus.php:370
+#: postviews_plus_admin.php:33
 msgid "Update BOT User_agent Success"
 msgstr ""
 
-#: postviews_plus.php:379
+#: postviews_plus_admin.php:42
 msgid "Report BOT User_agent Success"
 msgstr ""
 
-#: postviews_plus.php:381
+#: postviews_plus_admin.php:44
 msgid "Report BOT User_agent Fail"
 msgstr ""
 
-#: postviews_plus.php:388
+#: postviews_plus_admin.php:51
 msgid "Reset Bot User_agent Success"
 msgstr ""
 
-#: postviews_plus.php:399
+#: postviews_plus_admin.php:69
+#: postviews_plus_admin.php:104
 msgid "Options"
 msgstr ""
 
-#: postviews_plus.php:399
-msgid "Update Options"
-msgstr ""
-
-#: postviews_plus.php:399
-msgid "Reset Option"
-msgstr ""
-
-#: postviews_plus.php:399
-msgid "Reset Post Views"
-msgstr ""
-
-#: postviews_plus.php:400
+#: postviews_plus_admin.php:70
+#: postviews_plus_admin.php:105
 msgid "Remember the User_agent Of User."
 msgstr ""
 
-#: postviews_plus.php:401
+#: postviews_plus_admin.php:71
+#: postviews_plus_admin.php:106
 msgid "Add Views number if User is logoin."
 msgstr ""
 
-#: postviews_plus.php:402
+#: postviews_plus_admin.php:72
+#: postviews_plus_admin.php:107
 msgid "Add Views number in Blog Index Page."
 msgstr ""
 
-#: postviews_plus.php:403
+#: postviews_plus_admin.php:73
+#: postviews_plus_admin.php:108
 msgid "Report BOT User_agent when update."
 msgstr ""
 
-#: postviews_plus.php:404
+#: postviews_plus_admin.php:74
+#: postviews_plus_admin.php:109
 #, php-format
-msgid "Output format of most views. (%1$s: Post link. %2$s: Views number.)"
+msgid "Output format of most views. (%1$s: Views number. %2$s: Post link.)"
 msgstr ""
 
-#: postviews_plus.php:404
+#: postviews_plus_admin.php:74
+#: postviews_plus_admin.php:109
 msgid "with bot views."
 msgstr ""
 
-#: postviews_plus.php:405
+#: postviews_plus_admin.php:75
+#: postviews_plus_admin.php:110
 msgid "without bot views."
 msgstr ""
 
-#: postviews_plus.php:407
+#: postviews_plus_admin.php:76
+#: postviews_plus_admin.php:104
+msgid "Update Options"
+msgstr ""
+
+#: postviews_plus_admin.php:76
+#: postviews_plus_admin.php:104
+msgid "Reset Option"
+msgstr ""
+
+#: postviews_plus_admin.php:76
+#: postviews_plus_admin.php:104
+msgid "Reset Post Views"
+msgstr ""
+
+#: postviews_plus_admin.php:79
+#: postviews_plus_admin.php:112
 msgid "User User_agent"
 msgstr ""
 
-#: postviews_plus.php:407
+#: postviews_plus_admin.php:81
+#: postviews_plus_admin.php:112
 msgid "Clear User User_agent record"
 msgstr ""
 
-#: postviews_plus.php:410
+#: postviews_plus_admin.php:84
+#: postviews_plus_admin.php:115
 msgid "Bot User_agent"
 msgstr ""
 
-#: postviews_plus.php:410
+#: postviews_plus_admin.php:85
+#: postviews_plus_admin.php:116
+msgid "Here are a list of Bot User_agent. Start each User_agent on a new line."
+msgstr ""
+
+#: postviews_plus_admin.php:86
+#: postviews_plus_admin.php:115
 msgid "Update BOT User_agent"
 msgstr ""
 
-#: postviews_plus.php:410
+#: postviews_plus_admin.php:86
+#: postviews_plus_admin.php:115
 msgid "Reset BOT User_agent"
-msgstr ""
-
-#: postviews_plus.php:411
-msgid "Here are a list of Bot User_agent. Start each User_agent on a new line."
 msgstr ""
 
