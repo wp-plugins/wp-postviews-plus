@@ -27,7 +27,7 @@ function postviews_plus_option_update()
 			$text .= '<font color="green">'.__('Cleared User User_agent Success' ,'postviews_plus').'</font>';
 		}
 	} elseif( isset($_POST['update_bot_ua']) ) {
-		$botAgent = str_replace("\r\n", ARRAY_CAT, trim($_POST['botagent']));
+		$botAgent = ereg_replace("(\r\n)+", ARRAY_CAT, trim($_POST['botagent']));
 		if( update_option('PV+_botagent', $botAgent) ) {
 			$text .= '<font color="green">'.__('Update BOT User_agent Success' ,'postviews_plus').'</font><br />';
 			$pv_option = get_option('PV+_option');

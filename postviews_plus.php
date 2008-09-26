@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.11
+Version: 1.1.12
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -32,18 +32,18 @@ function a2s($a) {
 	return implode(ARRAY_CAT,$a);
 }
 function check_bot() {
-	$useragent = trim($_SERVER['HTTP_USER_AGENT']);
+	$useragent = htmlspecialchars(trim($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES);
 	$bot = false;
 	if( strlen($useragent)>5 ) {
 		$botAgent = s2a(get_option('PV+_botagent'));
 		foreach($botAgent as $lookfor) {
-			if( stristr($useragent, $lookfor)!==false ) {
+			if( strpos($useragent, $lookfor)!==false ) {
 				$bot = true;
 				break;
 			}
 		}
 	} else {
-	$bot = true;
+		$bot = true;
 	}
 	return $bot;
 }
@@ -360,15 +360,19 @@ function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days
 }
 
 // Function: Display Total Views
-function get_totalviews($display=true, $with_bot=true) {
+function get_totalviews($display=true, $with_bot=true, $with_post=true) {
 	global $wpdb;
 	$views = get_option('PV+_views');
 	if( $with_bot ) {
 		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED),0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views" OR meta_key = "bot_views"');
-		$total_views += array_sum($views['user']) + array_sum($views['bot']);
+		if( $with_post ) {
+			$total_views += array_sum($views['user']) + array_sum($views['bot']);
+		}
 	} else {
 		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED),0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views"');
-		$total_views += array_sum($views['user']);
+		if( $with_post ) {
+			$total_views += array_sum($views['user']);
+		}
 	}
 	if( $display ) {
 		echo number_format($total_views);
