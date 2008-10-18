@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-14 15:45+0800\n"
-"PO-Revision-Date: 2008-09-14 15:45+0800\n"
+"POT-Creation-Date: 2008-10-07 15:07+0800\n"
+"PO-Revision-Date: 2008-10-07 15:07+0800\n"
 "Last-Translator: Richer <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <fantasyworldidvtw@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -15,19 +15,19 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: postviews_plus.php:205
-#: postviews_plus.php:258
-#: postviews_plus.php:298
-#: postviews_plus.php:353
+#: postviews_plus.php:200
+#: postviews_plus.php:253
+#: postviews_plus.php:293
+#: postviews_plus.php:348
 msgid "N/A"
 msgstr "沒有文章"
 
-#: postviews_plus.php:384
+#: postviews_plus.php:383
 #: postviews_plus_admin.php:17
 msgid "Views"
 msgstr "瀏覽數"
 
-#: postviews_plus.php:384
+#: postviews_plus.php:383
 #: postviews_plus_admin.php:17
 msgid "User Views"
 msgstr "使用者瀏覽數"

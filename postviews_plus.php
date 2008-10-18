@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.12
+Version: 1.1.13
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -31,23 +31,34 @@ function s2a($s) {
 function a2s($a) {
 	return implode(ARRAY_CAT,$a);
 }
-function check_bot() {
-	$useragent = htmlspecialchars(trim($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES);
+
+function check_bot($add) {
+	$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
 	$bot = false;
 	if( strlen($useragent)>5 ) {
 		$botAgent = s2a(get_option('PV+_botagent'));
 		foreach($botAgent as $lookfor) {
-			if( strpos($useragent, $lookfor)!==false ) {
-				$bot = true;
-				break;
+			if( !empty($lookfor) ) {
+				if( strpos($useragent, $lookfor)!==false ) {
+					$bot = true;
+					break;
+				}
 			}
 		}
 	} else {
 		$bot = true;
 	}
+	if( !$bot && $add==1 ) {
+		$PV_useragent = s2a(get_option('PV+_useragent'));
+		if( !in_array($useragent, $PV_useragent) ) {
+			$PV_useragent[] = $useragent;
+			update_option('PV+_useragent', a2s($PV_useragent));
+		}
+	}
 	return $bot;
 }
-function wppvp_snippet_chars($text, $length = 0) {
+
+function wp_snippet_chars($text, $length = 0) {
 	if( function_exists('mb_internal_encoding') ) {
 		mb_internal_encoding(get_bloginfo('charset'));
 		if( $length == 0 ) {
@@ -77,66 +88,49 @@ if( is_admin() ) {
 
 // Function: Calculate Post Views
 function process_postviews($content) {
-	global $id, $user_ID;
 	static $postid = array();
 	$pv_option = get_option('PV+_option');
-	if( !$user_ID || $pv_option['userlogoin']==1 ) {
-		$is_bot = check_bot();
+	if( !is_user_logged_in() || $pv_option['userlogoin']==1 ) {
 		if( is_home() ) {
 			$views = get_option('PV+_views');
-			if( $is_bot ) {
+			if( check_bot($pv_option['getuseragent']) ) {
 				$views['bot']['index'] += 1;
 			} else {
 				$views['user']['index'] += 1;
 			}
 			update_option('PV+_views', $views);
-		}
-		elseif( is_category() ) {
+		} elseif( is_single() || is_page() ) {
+			global $post;
+			if( !in_array($id, $postid) ) {
+				$postid[] = $post->ID;
+				if( check_bot($pv_option['getuseragent']) ) {
+					$post_bot_views = intval(get_post_meta($post->ID, 'bot_views', true));
+					if( !update_post_meta($post->ID, 'bot_views', ($post_bot_views+1)) ) {
+						add_post_meta($post->ID, 'bot_views', 1, true);
+					}
+				} else {
+					$post_views = intval(get_post_meta($post->ID, 'views', true));
+					if( !update_post_meta($post->ID, 'views', ($post_views+1)) ) {
+						add_post_meta($post->ID, 'views', 1, true);
+					}
+				}
+			}
+		} elseif( is_category() ) {
 			$views = get_option('PV+_views');
-			if( $is_bot ) {
+			if( check_bot($pv_option['getuseragent']) ) {
 				$views['bot']['cat_' . intval(get_query_var('cat'))] += 1;
 			} else {
 				$views['user']['cat_' . intval(get_query_var('cat'))] += 1;
 			}
 			update_option('PV+_views', $views);
-		}
-		elseif( is_tag() ) {
+		} elseif( is_tag() ) {
 			$views = get_option('PV+_views');
-			if( $is_bot ) {
+			if( check_bot($pv_option['getuseragent']) ) {
 				$views['bot']['tag_' . intval(get_query_var('tag_id'))] += 1;
 			} else {
 				$views['user']['tag_' . intval(get_query_var('tag_id'))] += 1;
 			}
 			update_option('PV+_views', $views);
-		}
-		elseif( is_single() || is_page() ) {
-			if( !in_array($id, $postid) ) {
-				$postid[] = $id;
-				if( $is_bot ) {
-					$views = intval(get_post_meta($id, 'bot_views', true));
-					add_post_meta($id, 'bot_views', 1, true) or update_post_meta($id, 'bot_views', ($views+1));
-				} else {
-					$views = intval(get_post_meta($id, 'views', true));
-					add_post_meta($id, 'views', 1, true) or update_post_meta($id, 'views', ($views+1));
-				}
-			}
-		}
-		else {
-			$views = get_option('PV+_views');
-			if( $is_bot ) {
-				$views['bot']['other'] += 1;
-			} else {
-				$views['user']['other'] += 1;
-			}
-			update_option('PV+_views', $views);
-		}
-		if( !$is_bot && $pv_option['getuseragent']==1 ) {
-			$useragent = trim($_SERVER['HTTP_USER_AGENT']);
-			$PV_useragent = s2a(get_option('PV+_useragent'));
-			if( !in_array($useragent, $PV_useragent) ) {
-				$PV_useragent[] = $useragent;
-				update_option('PV+_useragent', a2s($PV_useragent));
-			}
 		}
 	}
 	return $content;
@@ -166,7 +160,8 @@ function the_user_views($text_views=' User Views', $display=true) {
 
 // Function: Display The Post Bot Views
 function the_bot_views($text_views=' Bot Views', $display=true) {
-	$post_bot_views = intval(post_custom('bot_views'));
+	global $post;
+	$post_bot_views = intval(get_post_meta($post->ID, 'bot_views', true));
 	if( $display ) {
 		echo number_format($post_bot_views).$text_views;
 	} else {
@@ -187,10 +182,10 @@ function get_most_viewed($mode='', $limit=10, $chars=0, $display=true, $with_bot
 		$where = '(p.post_type = "post" OR p.post_type = "page")';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED),0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED),0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
@@ -198,8 +193,8 @@ function get_most_viewed($mode='', $limit=10, $chars=0, $display=true, $with_bot
 		foreach($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wppvp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'wp-postviews_plus').'</li>';
@@ -240,10 +235,10 @@ function get_most_viewed_category($category_id=1, $mode='', $limit=10, $chars=0,
 		$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED),0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED),0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
@@ -251,8 +246,8 @@ function get_most_viewed_category($category_id=1, $mode='', $limit=10, $chars=0,
 		foreach ($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wppvp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'wp-postviews_plus').'</li>'."\n";
@@ -280,10 +275,10 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 		$where = '(p.post_type = "post" OR p.post_type = "page")';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED),0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED),0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
@@ -291,8 +286,8 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 		foreach($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wppvp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'postviews_plus').'</li>'."\n";
@@ -335,10 +330,10 @@ function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days
 		$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED),0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED),0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
@@ -346,8 +341,8 @@ function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days
 		foreach ($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wppvp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format,$post_views,$link).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'postviews_plus').'</li>'."\n";
@@ -360,16 +355,16 @@ function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days
 }
 
 // Function: Display Total Views
-function get_totalviews($display=true, $with_bot=true, $with_post=true) {
+function get_totalviews($display=true, $with_bot=true) {
 	global $wpdb;
 	$views = get_option('PV+_views');
 	if( $with_bot ) {
-		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED),0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views" OR meta_key = "bot_views"');
+		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views" OR meta_key = "bot_views"');
 		if( $with_post ) {
 			$total_views += array_sum($views['user']) + array_sum($views['bot']);
 		}
 	} else {
-		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED),0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views"');
+		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views"');
 		if( $with_post ) {
 			$total_views += array_sum($views['user']);
 		}
@@ -394,6 +389,7 @@ function postviews_plus_add() {
 }
 function postviews_plus_option() {
 	if( function_exists('add_options_page') ) {
+		// Loading language file...
 		$currentLocale = get_locale();
 		if( !empty($currentLocale) ) {
 			$moFile = dirname(__FILE__).'/postviews_plus-'.$currentLocale.'.mo';

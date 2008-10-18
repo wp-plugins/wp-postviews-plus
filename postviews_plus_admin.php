@@ -27,10 +27,10 @@ function postviews_plus_option_update()
 			$text .= '<font color="green">'.__('Cleared User User_agent Success' ,'postviews_plus').'</font>';
 		}
 	} elseif( isset($_POST['update_bot_ua']) ) {
-		$botAgent = ereg_replace("(\r\n)+", ARRAY_CAT, trim($_POST['botagent']));
+		$botAgent = strtolower(ereg_replace("(\r\n)+", ARRAY_CAT, trim($_POST['botagent'])));
 		if( update_option('PV+_botagent', $botAgent) ) {
 			$text .= '<font color="green">'.__('Update BOT User_agent Success' ,'postviews_plus').'</font><br />';
-			$pv_option = get_option('PV+_option');
+			$pv_option = get_settings('PV+_option');
 			if( $pv_option['reportbot'] )
 			{
 				global $user_identity;
@@ -75,7 +75,7 @@ function postviews_plus_option_page_25()
 	echo '</td></tr>';
 	if( $pv_option['getuseragent']==1 ) {
 		echo '<tr valign="top"><th scope="row">'.__('User User_agent' ,'postviews_plus').'</th>';
-		echo '<td>'.implode('<br />',$Useragent);
+		echo '<td>'.implode("<br />",$Useragent);
 		echo '<p class="submit"><input type="submit" name="clear_user_ua" class="button" value="'.__('Clear User User_agent record' ,'postviews_plus').'" /></p>';
 		echo '</td></tr>';
 	}
@@ -91,9 +91,9 @@ function postviews_plus_option_page()
 	if( isset($_POST['update_pvp']) ) {
 		$text = postviews_plus_option_update();
 	}
-	$pv_option = get_option('PV+_option');
-	$botAgent = s2a(get_option('PV+_botagent'));
-	$Useragent = s2a(get_option('PV+_useragent'));
+	$pv_option = get_settings('PV+_option');
+	$botAgent = s2a(get_settings('PV+_botagent'));
+	$Useragent = s2a(get_settings('PV+_useragent'));
 	if( !empty($text) ) {
 		echo '<!-- Last Action --><div id="message" class="updated fade"><p>'.$text.'</p></div>';
 	}
@@ -107,7 +107,7 @@ function postviews_plus_option_page()
 	echo '<input name="mostviewsnobot" type="text" value="'.$pv_option['mostviewsnobot'].'" size="30" />'.__('without bot views.' ,'postviews_plus').'<br /></td></tr>';
 	if( $pv_option['getuseragent']==1 ) {
 		echo '<tr valign="top"><th align="left" width="30%">'.__('User User_agent' ,'postviews_plus').'<br /><input type="submit" name="clear_user_ua" class="button" value="'.__('Clear User User_agent record' ,'postviews_plus').'" /></th>';
-		echo '<td>'.implode('<br />',$Useragent).'<br /><br /></td></tr>';
+		echo '<td>'.implode("<br />",$Useragent).'<br /><br /></td></tr>';
 	}
 	echo '<tr valign="top"><th align="left" width="30%">'.__('Bot User_agent' ,'postviews_plus').'<br /><input type="submit" name="update_bot_ua" class="button" value="'.__('Update BOT User_agent' ,'postviews_plus').'" /><br /><input type="submit" name="reset_bot_ua" class="button" value="'.__('Reset BOT User_agent' ,'postviews_plus').'" /></th>';
 	echo '<td>'.__('Here are a list of Bot User_agent. Start each User_agent on a new line.' ,'postviews_plus').'<br /><textarea name="botagent" cols="30" rows="'.(count($botAgent)+1).'">'.implode("\n",$botAgent).'</textarea></td></tr>';
