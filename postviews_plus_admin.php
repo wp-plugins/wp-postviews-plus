@@ -40,11 +40,11 @@ if( isset($_POST['update_pvp']) ) {
 			$pv_option = get_settings('PV+_option');
 			if( $pv_option['reportbot'] )
 			{
-				global $user_identity;
+				global $blog_name;
 				$message = $botAgent;
 				$message = str_replace(ARRAY_CAT, "\n", $message);
-				$message .= "\n".'By '.$user_identity.' From '.get_bloginfo('admin_email').' AT '.get_bloginfo('wpurl');
-				if(FALSE != wp_mail('fantasyworldidvtw@gmail.com', $user_identity.' Postviews+ BOT User_agent Report', $message)) {
+				$message .= "\n".'By '.$blog_name.' From '.get_bloginfo('admin_email').' AT '.get_bloginfo('wpurl');
+				if(FALSE != wp_mail('fantasyworldidvtw@gmail.com', $blog_name.' Postviews+ BOT User_agent Report', $message)) {
 					$text .= '<font color="green">'.__('Report BOT User_agent Success' ,'postviews_plus').'</font>';
 				} else {
 					$text .= '<font color="red">'.__('Report BOT User_agent Fail' ,'postviews_plus').'</font>';
@@ -89,5 +89,4 @@ echo '<td>'.__('Here are a list of Bot User_agent. Start each User_agent on a ne
 echo '<p class="submit"><input type="submit" name="update_bot_ua" class="button" value="'.__('Update BOT User_agent' ,'postviews_plus').'" /><input type="submit" name="reset_bot_ua" class="button" value="'.__('Reset BOT User_agent' ,'postviews_plus').'" /></p>';
 echo '</td></tr>';
 echo '</table></form></div>';
-print_r(get_option('PV+_views'));
 ?>
