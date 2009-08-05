@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.16
+Version: 1.1.17
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -18,15 +18,8 @@ Author URI: http://fantasyworld.idv.tw/
 * Author URI: http://www.lesterchan.net
 **************************************************/
 
-// Load WP-Config File If This File Is Called Directly
-if( !function_exists('add_action') ) {
-	$wp_root = './../../..';
-	if( file_exists($wp_root . '/wp-load.php') ) {
-		require_once($wp_root . '/wp-load.php');
-	} else {
-		require_once($wp_root . '/wp-config.php');
-	}
-}
+define('ARRAY_CAT','**');
+define('IS_WP25', version_compare($wp_version, '2.4', '>=') );
 
 function s2a($s) {
 	if( is_array($s) ) {
@@ -39,164 +32,33 @@ function a2s($a) {
 	return implode(ARRAY_CAT,$a);
 }
 
-// Some config value
-define('ARRAY_CAT','**');
-class wppvp {
-	var $def_botAgent;
-	var $def_pv_option;
-	var $def_views;
-	var $botAgent;
-	var $pv_option;
-	var $count_id;
-	var $count_type;
-	var $count_bot;
-
-	function wppvp () {
-	  $this->def_botAgent = array(
-			'bot',
-			'spider',
-			'slurp');
-   	$this->def_pv_option = array(
-			'getuseragent'=>0,
-			'userlogoin'=>0,
-			'reportbot'=>1,
-			'mostviewsbot'=>'%3$s : %2$s - %1$s '.__('Views', 'postviews_plus'),
-			'mostviewsnobot'=>'%3$s : %2$s - %1$s '.__('User Views', 'postviews_plus'));
-		$this->def_views = array(
-			'user'=>array(),
-			'bot'=>array());
-		$this->pv_option = get_option('PV+_option');
-		$this->botAgent = s2a(get_option('PV+_botagent'));
-	}
-	function add_count_data() {
-	  $this->count_bot = ($this->wp_pp_check_bot()) ? 'bot' : 'user';
-	  if( isset($_GET['todowppvc']) && defined('WP_CACHE') && WP_CACHE ) {
-	    $this->count_type = htmlspecialchars($_GET['type']);
-	    $this->count_id = intval($_GET['id']);
-	  } else {
-	    if( is_single() || is_page() ) {
-	      global $post;
-				$this->count_type = 'post';
-        $this->count_id = $post->ID;
-			} elseif( is_home() ) {
-				$this->count_type = 'index';
-        $this->count_id = 1;
-			} elseif( is_category() ) {
-			  $this->count_type = 'cat';
-        $this->count_id = intval(get_query_var('cat'));
-			} elseif( is_tag() ) {
-			  $this->count_type = 'tag';
-        $this->count_id = intval(get_query_var('tag_id'));
-			} else {
-			  $this->count_type = $_SERVER['REQUEST_URI'];
-        $this->count_id = 1;
-			}
-	  }
-	}
-
-	function wp_pp_check_bot() {
-		$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
-		$bot = false;
-		if ( preg_match('/^((mozilla)|(opera))/', $useragent) ) {
-			if( count($this->botAgent)>0 ) {
-				$regex = '/(' . implode($this->botAgent, ')|(') . ')/';
-				$bot = preg_match($regex, $useragent);
-			}
-		} else {
-			$bot = true;
-		}
-		if( !$bot && $this->pv_option['getuseragent']==1 ) {
-			$PV_useragent = s2a(get_option('PV+_useragent'));
-			if( !in_array($useragent, $PV_useragent) ) {
-				$PV_useragent[] = $useragent;
-				update_option('PV+_useragent', a2s($PV_useragent));
-			}
-		}
-		return $bot;
-	}
-}
-
-$pv_config = new wppvp;
-
-// Function: Increment Post Views of AJAX
-increment_views();
-function increment_views() {
-	if( isset($_GET['todowppvc']) ) {
-		global $pv_config;
-		$pv_config->add_count_data();
-		if( $pv_config->count_id>0 && defined('WP_CACHE') && WP_CACHE) {
-			postviews_increment_views();
-			echo("\r\n");
-		}
-	}
-}
-
-// Function: Calculate Post Views(real do)
-function postviews_increment_views() {
-	global $wpdb, $pv_config;
-	switch( $pv_config->count_type ) {
-		case 'post':
-			$post_bot_views = intval(get_post_meta($pv_config->count_id, 'bot_views', true));
-			$post_views = intval(get_post_meta($pv_config->count_id, 'views', true));
-			if( $pv_config->count_bot=='bot' ) {
-				if( !update_post_meta($pv_config->count_id, 'bot_views', ($post_bot_views+1)) ) {
-					add_post_meta($pv_config->count_id, 'bot_views', 1, true);
-				}
-				if( defined('WP_CACHE') && WP_CACHE ) {
-				  echo('if(document.getElementById("wppvp_ptv_'.$pv_config->count_id.'")){document.getElementById("wppvp_ptv_'.$pv_config->count_id.'").innerHTML="' . ($post_bot_views+$post_views+1) . '";}');
-				  echo('if(document.getElementById("wppvp_ptb_'.$pv_config->count_id.'")){document.getElementById("wppvp_ptb_'.$pv_config->count_id.'").innerHTML="' . ($post_bot_views+1) . '";}');
-				}
-			} else {
-				if( !update_post_meta($pv_config->count_id, 'views', ($post_views+1)) ) {
-					add_post_meta($pv_config->count_id, 'views', 1, true);
-				}
-				if( defined('WP_CACHE') && WP_CACHE ) {
-				  echo('if(document.getElementById("wppvp_ptv_'.$pv_config->count_id.'")){document.getElementById("wppvp_ptv_'.$pv_config->count_id.'").innerHTML="' . ($post_bot_views+$post_views+1) . '";}');
-				  echo('if(document.getElementById("wppvp_ptu_'.$pv_config->count_id.'")){document.getElementById("wppvp_ptu_'.$pv_config->count_id.'").innerHTML="' . ($post_views+1) . '";}');
+function check_bot($add) {
+	$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
+	$bot = false;
+	if( strlen($useragent)>5 ) {
+		$botAgent = s2a(get_option('PV+_botagent'));
+		foreach($botAgent as $lookfor) {
+			if( !empty($lookfor) ) {
+				if( strpos($useragent, $lookfor)!==false ) {
+					$bot = true;
+					break;
 				}
 			}
-			break;
-		case 'index':
-		case 'cat':
-		case 'tag':
-			$add_name = $pv_config->count_type . '_' . $pv_config->count_id;
-			$views = get_option('PV+_views');
-			if( isset($views[$pv_config->count_bot][$add_name]) ) {
-				$views[$pv_config->count_bot][$add_name] += 1;
-			} else {
-				$views[$pv_config->count_bot][$add_name] = 1;
-			}
-			update_option('PV+_views', $views);
-			break;
-	}
-	if( defined('WP_CACHE') && WP_CACHE ) {
-	  $views = get_option('PV+_views');
-		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views" OR meta_key = "bot_views"');
-		echo('if(document.getElementById("wppvp_tv1")){document.getElementById("wppvp_tv1").innerHTML="' . ($total_views+array_sum($views['user'])+array_sum($views['bot'])) . '";}');
-		echo('if(document.getElementById("wppvp_tv2")){document.getElementById("wppvp_tv2").innerHTML="' . ($total_views) . '";}');
-		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views"');
-		echo('if(document.getElementById("wppvp_tv3")){document.getElementById("wppvp_tv3").innerHTML="' . ($total_views+array_sum($views['user'])) . '";}');
-		echo('if(document.getElementById("wppvp_tv4")){document.getElementById("wppvp_tv4").innerHTML="' . ($total_views) . '";}');
-	}
-}
-
-// Function: WP-PostViews Plus Option Menu
-add_action('admin_menu', 'postviews_plus_option');
-function postviews_plus_option() {
-	if (function_exists('add_options_page')) {
-		// Loading language file...
-		$currentLocale = get_locale();
-		if( !empty($currentLocale) ) {
-			$moFile = dirname(__FILE__).'/postviews_plus-'.$currentLocale.'.mo';
-			if( @file_exists($moFile) && is_readable($moFile) ) {
-				load_textdomain('postviews_plus', $moFile);
-			}
 		}
-		add_options_page('WP-PostViews Plus', 'PostViews+', 'manage_options', 'wp-postviews-plus/postviews_plus_admin.php');
+	} else {
+		$bot = true;
 	}
+	if( !$bot && $add==1 ) {
+		$PV_useragent = s2a(get_option('PV+_useragent'));
+		if( !in_array($useragent, $PV_useragent) ) {
+			$PV_useragent[] = $useragent;
+			update_option('PV+_useragent', a2s($PV_useragent));
+		}
+	}
+	return $bot;
 }
 
-function wp_pp_snippet_chars($text, $length = 0) {
+function wp_snippet_chars($text, $length = 0) {
 	if( function_exists('mb_internal_encoding') ) {
 		mb_internal_encoding(get_bloginfo('charset'));
 		if( $length == 0 ) {
@@ -217,33 +79,61 @@ function wp_pp_snippet_chars($text, $length = 0) {
 	}
 }
 
-add_action('wp_head', 'add_postviews_mark');
-function add_postviews_mark() {
+if( is_admin() ) {
+	add_action('activate_wp-postviews-plus/postviews_plus.php', 'postviews_plus_add');
+	add_action('admin_menu', 'postviews_plus_option');
+} else {
+	add_action('loop_start', 'process_postviews');
 }
 
-// Function: Calculate Post Views(Pre do)
-add_action('loop_start', 'process_postviews');
-function process_postviews() {
-	global $post, $pv_config;
+// Function: Calculate Post Views
+function process_postviews($content) {
 	static $postid = array();
-	if(!wp_is_post_revision($post)) {
-		$pv_option = get_option('PV+_option');
-		if( !is_user_logged_in() || $pv_option['userlogoin']==1 ) {
-			$pv_config->add_count_data();
-			if(defined('WP_CACHE') && WP_CACHE) {
-				echo("\n" . '<!-- Start Of Script Generated By WP-PostViews Plus 1.1.14 -->' . "\n");
-				wp_print_scripts('jquery');
-				echo('<script type="text/javascript">' . "\n");
-				echo('/* <![CDATA[ */' . "\n");
-				echo("jQuery.ajax({type:'GET',url:'" . plugins_url('wp-postviews-plus/postviews_plus.php') . "',data:'todowppvc=&type=" . $pv_config->count_type . "&id=" . $pc_config->count_id . "',cache:false,dataType:'script'});");
-				echo('/* ]]> */' . "\n");
-				echo('</script>' . "\n");
-				echo('<!-- End Of Script Generated By WP-PostViews Plus 1.1.14 -->' . "\n");
+	$pv_option = get_option('PV+_option');
+	if( !is_user_logged_in() || $pv_option['userlogoin']==1 ) {
+		if( is_home() ) {
+			$views = get_option('PV+_views');
+			if( check_bot($pv_option['getuseragent']) ) {
+				$views['bot']['index'] += 1;
 			} else {
-				postviews_increment_views();
+				$views['user']['index'] += 1;
 			}
+			update_option('PV+_views', $views);
+		} elseif( is_single() || is_page() ) {
+			global $post;
+			if( !in_array($id, $postid) ) {
+				$postid[] = $post->ID;
+				if( check_bot($pv_option['getuseragent']) ) {
+					$post_bot_views = intval(get_post_meta($post->ID, 'bot_views', true));
+					if( !update_post_meta($post->ID, 'bot_views', ($post_bot_views+1)) ) {
+						add_post_meta($post->ID, 'bot_views', 1, true);
+					}
+				} else {
+					$post_views = intval(get_post_meta($post->ID, 'views', true));
+					if( !update_post_meta($post->ID, 'views', ($post_views+1)) ) {
+						add_post_meta($post->ID, 'views', 1, true);
+					}
+				}
+			}
+		} elseif( is_category() ) {
+			$views = get_option('PV+_views');
+			if( check_bot($pv_option['getuseragent']) ) {
+				$views['bot']['cat_' . intval(get_query_var('cat'))] += 1;
+			} else {
+				$views['user']['cat_' . intval(get_query_var('cat'))] += 1;
+			}
+			update_option('PV+_views', $views);
+		} elseif( is_tag() ) {
+			$views = get_option('PV+_views');
+			if( check_bot($pv_option['getuseragent']) ) {
+				$views['bot']['tag_' . intval(get_query_var('tag_id'))] += 1;
+			} else {
+				$views['user']['tag_' . intval(get_query_var('tag_id'))] += 1;
+			}
+			update_option('PV+_views', $views);
 		}
 	}
+	return $content;
 }
 
 // Function: Display The Post Total Views
@@ -251,8 +141,7 @@ function the_views($text_views=' Views', $display=true) {
 	global $post;
 	$post_views = intval(get_post_meta($post->ID, 'views', true)) + intval(get_post_meta($post->ID, 'bot_views', true));
 	if( $display ) {
-		echo('<span id="wppvp_ptv_' . $post->ID . '">' . number_format($post_views) . '</span>' . $text_views);
-		return ;
+		echo number_format($post_views).$text_views;
 	} else {
 		return $post_views;
 	}
@@ -263,8 +152,7 @@ function the_user_views($text_views=' User Views', $display=true) {
 	global $post;
 	$post_user_views = intval(get_post_meta($post->ID, 'views', true));
 	if( $display ) {
-		echo('<span id="wppvp_ptu_' . $post->ID . '">' . number_format($post_user_views) . '</span>' . $text_views);
-		return ;
+		echo number_format($post_user_views).$text_views;
 	} else {
 		return $post_user_views;
 	}
@@ -275,12 +163,12 @@ function the_bot_views($text_views=' Bot Views', $display=true) {
 	global $post;
 	$post_bot_views = intval(get_post_meta($post->ID, 'bot_views', true));
 	if( $display ) {
-		echo('<span id="wppvp_ptb_' . $post->ID . '">' . number_format($post_bot_views) . '</span>' . $text_views);
-		return ;
+		echo number_format($post_bot_views).$text_views;
 	} else {
 		return $post_bot_views;
 	}
 }
+
 
 // Function: Display Most Viewed Page/Post
 function get_most_viewed($mode='', $limit=10, $chars=0, $display=true, $with_bot=true) {
@@ -305,22 +193,20 @@ function get_most_viewed($mode='', $limit=10, $chars=0, $display=true, $with_bot
 		foreach($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$post_link = '<a href="'.get_permalink($most_view->ID).'">'.wp_pp_snippet_chars($post_title, $chars).'</a>';
-			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
-			$output .= '<li>'.sprintf($output_format, $post_views, $post_link, $post_date).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'wp-postviews_plus').'</li>';
 	}
 	if( $display ) {
-		echo($output);
-		return ;
+		echo $output;
 	} else {
 		return $output;
 	}
 }
 
-// Function: Display Most Viewed Page/Post By Category ID
+### Function: Display Most Viewed Page/Post By Category ID
 function get_most_viewed_category($category_id=1, $mode='', $limit=10, $chars=0, $display=true, $with_bot=true) {
 	global $wpdb, $post;
 	$output_format = get_option('PV+_option');
@@ -360,16 +246,14 @@ function get_most_viewed_category($category_id=1, $mode='', $limit=10, $chars=0,
 		foreach ($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$post_link = '<a href="'.get_permalink($most_view->ID).'">'.wp_pp_snippet_chars($post_title, $chars).'</a>';
-			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
-			$output .= '<li>'.sprintf($output_format, $post_views, $post_link, $post_date).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'wp-postviews_plus').'</li>'."\n";
 	}
 	if($display) {
-		echo($output);
-		return ;
+		echo $output;
 	} else {
 		return $output;
 	}
@@ -402,22 +286,20 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 		foreach($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$post_link = '<a href="'.get_permalink($most_view->ID).'">'.wp_pp_snippet_chars($post_title, $chars).'</a>';
-			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
-			$output .= '<li>'.sprintf($output_format, $post_views, $post_link, $post_date).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'postviews_plus').'</li>'."\n";
 	}
 	if( $display ) {
-		echo($output);
-		return ;
+		echo $output;
 	} else {
 		return $output;
 	}
 }
 
-// Function: Get TimeSpan Most Viewed By Category
+### Function: Get TimeSpan Most Viewed By Category
 function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days=7, $display=true, $with_bot=true, $chars=0) {
 	global $wpdb, $post;	
 	$limit_date = current_time('timestamp') - ($days*86400);
@@ -459,58 +341,68 @@ function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days
 		foreach ($most_views as $most_view) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$post_link = '<a href="'.get_permalink($most_view->ID).'">'.wp_pp_snippet_chars($post_title, $chars).'</a>';
-			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
-			$output .= '<li>'.sprintf($output_format, $post_views, $post_link, $post_date).'</li>'."\n";
+			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
+			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
 		}
 	} else {
 		$output = '<li>'.__('N/A', 'postviews_plus').'</li>'."\n";
 	}
 	if( $display ) {
-		echo($output);
-		return ;
+		echo $output;
 	} else {
 		return $output;
 	}
 }
 
 // Function: Display Total Views
-function get_totalviews($display=true, $with_bot=true, $with_post=true) {
+function get_totalviews($display=true, $with_bot=true) {
 	global $wpdb;
 	$views = get_option('PV+_views');
 	if( $with_bot ) {
 		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views" OR meta_key = "bot_views"');
 		if( $with_post ) {
 			$total_views += array_sum($views['user']) + array_sum($views['bot']);
-		  $type = 1;
-		} else {
-		  $type = 2;
 		}
 	} else {
 		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views"');
 		if( $with_post ) {
 			$total_views += array_sum($views['user']);
-			$type = 3;
-		} else {
-		  $type = 4;
 		}
 	}
- if( $display ) {
-		echo('<span id="wppvp_tv' . $type . '">' . number_format($total_views) . '</span>');
-		return ;
+	if( $display ) {
+		echo number_format($total_views);
 	} else {
 		return $total_views;
 	}
 }
 
-// Function: Post Views Options
-add_action('activate_wp-postviews/wp-postviews.php', 'postviews_plus_add');
+// Function: Add Option Value
 function postviews_plus_add() {
 	global $wpdb;
-	global $pv_config;
-	add_option('PV+_botagent', a2s($pv_config->botAgent));
-	add_option('PV+_option', $pv_config->pv_option);
+	$botAgent = array('bot','spider','validator','google');
+	$pv_option = array('getuseragent'=>0, 'userlogoin'=>0, 'reportbot'=>1, 'mostviewsbot'=>'%2$s - %1$s '.__('Views', 'postviews_plus'), 'mostviewsnobot'=>'%2$s - %1$s '.__('User Views', 'postviews_plus'));
+	$views = array('user'=>array(), 'bot'=>array());
+	add_option('PV+_botagent', a2s($botAgent));
+	add_option('PV+_option', $pv_option);
 	add_option('PV+_useragent', '');
-	add_option('PV+_views', $pv_config->views);
+	add_option('PV+_views', $views);
+}
+function postviews_plus_option() {
+	if( function_exists('add_options_page') ) {
+		// Loading language file...
+		$currentLocale = get_locale();
+		if( !empty($currentLocale) ) {
+			$moFile = dirname(__FILE__).'/postviews_plus-'.$currentLocale.'.mo';
+			if( @file_exists($moFile) && is_readable($moFile) ) {
+				load_textdomain('postviews_plus', $moFile);
+			}
+		}
+		include dirname (__FILE__).'/postviews_plus_admin.php';
+		if( IS_WP25 ) {
+			add_options_page('WP-PostViews Plus', 'PostViews+', 'manage_options', dirname(__FILE__), 'postviews_plus_option_page_25');
+		} else {
+			add_options_page('WP-PostViews Plus', 'PostViews+', 'manage_options', dirname(__FILE__), 'postviews_plus_option_page');
+		}
+	}
 }
 ?>
