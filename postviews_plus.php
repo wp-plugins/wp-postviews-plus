@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.17
+Version: 1.1.18
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -18,45 +18,244 @@ Author URI: http://fantasyworld.idv.tw/
 * Author URI: http://www.lesterchan.net
 **************************************************/
 
+// Load WP-Config File If This File Is Called Directly
+if( !function_exists('add_action') ) {
+	$wp_root = './../../..';
+	if( file_exists($wp_root . '/wp-load.php') ) {
+		require_once($wp_root . '/wp-load.php');
+	} else {
+		require_once($wp_root . '/wp-config.php');
+	}
+}
+
 define('ARRAY_CAT','**');
-define('IS_WP25', version_compare($wp_version, '2.4', '>=') );
 
 function s2a($s) {
 	if( is_array($s) ) {
 		return $s;
 	} else {
-		return explode(ARRAY_CAT,$s);
+	  if( strlen($s)>0 ) {
+			return explode(ARRAY_CAT, $s);
+    } else {
+			return array();
+		}
 	}
 }
 function a2s($a) {
-	return implode(ARRAY_CAT,$a);
+	if( is_array($a) ) {
+		return implode(ARRAY_CAT, $a);
+	} else {
+	  return $a;
+	}
 }
 
-function check_bot($add) {
-	$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
-	$bot = false;
-	if( strlen($useragent)>5 ) {
-		$botAgent = s2a(get_option('PV+_botagent'));
-		foreach($botAgent as $lookfor) {
-			if( !empty($lookfor) ) {
-				if( strpos($useragent, $lookfor)!==false ) {
-					$bot = true;
+class wppvp{
+  var $botAgent;
+	var $pv_option;
+	var $views;
+
+	var $count_id;
+	var $count_type;
+	var $count_bot;
+	var $did_id;
+
+	function wppvp () {
+	  $this->botAgent = array(
+			'now' => s2a(get_option('PV+_botagent')),
+			'def' => array(
+				'bot',
+				'spider',
+				'slurp'));
+   	$this->pv_option = array(
+   	  'now' => get_option('PV+_option'),
+			'def' => array(
+				'getuseragent' => 0,
+				'userlogoin' => 0,
+				'reportbot' => 1,
+				'mostviewsbot' => '%3$s : %2$s - %1$s ' . __('Views', 'postviews_plus'),
+				'mostviewsnobot' => '%3$s : %2$s - %1$s ' . __('User Views', 'postviews_plus')));
+		$this->views = array(
+		  'now' => get_option('PV+_views'),
+			'def' => array(
+				'user' => array(),
+				'bot' => array()));
+		$this->did_id = array();
+
+		if( isset($_GET['todowppvp']) && defined('WP_CACHE') && WP_CACHE ) {
+			$this->add_count_data();
+			$this->increment_views();
+			$this->change_views();
+			echo("\r\n");
+//			global $user_level;
+//			if( $user_level>8 ) {
+//				echo('alert("' . get_num_queries() . ' queries. ' . timer_stop(0) . ' seconds.");');
+//			}
+		}
+	}
+	function is_bot() {
+		$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
+		$bot = false;
+		if ( preg_match('/((mozilla\/)|(opera\/))/', $useragent) ) {
+			if( count($this->botAgent['now'])>0 ) {
+				$regex = '/(' . str_replace('/', '\/', implode($this->botAgent['now'], ')|(')) . ')/';
+				$bot = preg_match($regex, $useragent);
+			}
+		} else {
+			$bot = true;
+		}
+		if( !$bot && $this->pv_option['now']['getuseragent']==1 ) {
+			$PV_useragent = s2a(get_option('PV+_useragent'));
+			if( !in_array($useragent, $PV_useragent) ) {
+				$PV_useragent[] = $useragent;
+				update_option('PV+_useragent', a2s($PV_useragent));
+			}
+		}
+		return $bot;
+	}
+	function add_count_data() {
+	  if( isset($_GET['todowppvp']) && defined('WP_CACHE') && WP_CACHE ) {
+	    $this->count_bot = $this->is_bot() ? 'bot' : 'user';
+	    $this->count_type = htmlspecialchars(trim($_GET['type']));
+	    $this->count_id = htmlspecialchars(trim($_GET['id']));
+	  } else {
+	    if( !(defined('WP_CACHE') && WP_CACHE) ) {
+	      $this->count_bot = $this->is_bot() ? 'bot' : 'user';
+	    }
+	    if( is_single() || is_page() ) {
+  	    global $post;
+				$this->count_type = 'post';
+				$this->count_id = $post->ID;
+			} elseif( is_home() ) {
+				$this->count_type = 'index';
+				$this->count_id = intval(get_query_var('paged'));
+				if( $this->count_id==0 ) {
+			  	$this->count_id = 1;
+				}
+			} elseif( is_category() ) {
+			  $this->count_type = 'cat';
+		  	$this->count_id = intval(get_query_var('paged'));
+				if( $this->count_id==0 ) {
+				  $this->count_id = 1;
+				}
+				$this->count_id = intval(get_query_var('cat')) . '_' . $this->count_id;
+			} elseif( is_tag() ) {
+			  $this->count_type = 'tag';
+			  $this->count_id = intval(get_query_var('paged'));
+				if( $this->count_id==0 ) {
+			  	$this->count_id = 1;
+				}
+				$this->count_id = intval(get_query_var('tag_id')) . '_' . $this->count_id;
+			} else {
+		  	$this->count_type = $_SERVER['REQUEST_URI'];
+				$this->count_id = 1;
+			}
+		}
+	}
+	function increment_views() {
+ 	  if( !in_array($this->count_id, $this->did_id) ) {
+ 	    $this->did_id[] = $this->count_id;
+			switch( $this->count_type ) {
+				case 'post':
+					if( $this->count_bot=='bot' ) {
+						$post_bot_views = intval(get_post_meta($this->count_id, 'bot_views', true));
+						if( !update_post_meta($this->count_id, 'bot_views', ($post_bot_views+1)) ) {
+							add_post_meta($this->count_id, 'bot_views', 1, true);
+						}
+					} else {
+					  $post_views = intval(get_post_meta($this->count_id, 'views', true));
+						if( !update_post_meta($this->count_id, 'views', ($post_views+1)) ) {
+							add_post_meta($this->count_id, 'views', 1, true);
+						}
+					}
 					break;
+				case 'index':
+				case 'cat':
+				case 'tag':
+					$add_name = $this->count_type . '_' . $this->count_id;
+					if( isset($views[$this->count_bot][$add_name]) ) {
+						$this->views['now'][$this->count_bot][$add_name] += 1;
+					} else {
+						$this->views['now'][$this->count_bot][$add_name] = 1;
+					}
+					update_option('PV+_views', $this->views['now']);
+					break;
+			}
+		}
+	}
+	function add_cache_stats($addin) {
+/*	  global $wpdb, $post;
+	  $sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+		$data = $wpdb->get_row($sql);
+		if( $data ) {
+		  switch( $addin ) {
+			  case 'tv':
+			  case 'tuv':
+			  case 'tbv':
+			    $temp = s2a($data->$addin);
+			    $temp[] = $post->ID;
+					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET ' . $addin .'="' . a2s($temp) . '"  WHERE count_type="' . $this-> count_type . '" AND count_id="' . $this->count_id . '"';
+					break;
+				case 'gt1':
+				case 'gt2':
+				case 'gt3':
+				case 'gt4':
+				  $temp = s2a($this->gt);
+			    $temp[] = $addin[2];
+					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET gt="' . a2s($temp) . '" WHERE count_type="' . $this-> count_type . '" AND count_id="' . $this->count_id . '"';
+					break;
+			}
+		} else {
+			switch( $addin ) {
+			  case 'tv':
+			  case 'tuv':
+			  case 'tbv':
+					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, ' . $addin .') VALUES ("' . $this-> count_type . '", "' . $this->count_id . '", "' . $post->ID . '")';
+					break;
+				case 'gt1':
+				case 'gt2':
+				case 'gt3':
+				case 'gt4':
+					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, gt) VALUES ("' . $this-> count_type . '", "' . $this->count_id . '", "' . $addin[2] . '")';
+					break;
+			}
+		}
+		$wpdb->query($sql);
+*/	}
+	function change_views() {
+/*	  global $wpdb;
+	 	$sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+		$data = $wpdb->get_row($sql);
+		if( $data ) {
+		  $gt = s2a($data->gt);
+	  	if( count($gt)>0 ) {
+				if( in_array(1, $gt) || in_array(2, $gt) ) {
+					$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views" OR meta_key = "bot_views"');
+					if( in_array(1, $gt) ) {
+					  echo('document.getElementById("wppvp_gt_1").innerHTML="' . ($total_views) . '";');
+					}
+					if( in_array(2, $gt) ) {
+					  echo('document.getElementById("wppvp_gt_2").innerHTML="' . ($total_views+array_sum($this->views['now']['user'])+array_sum($this->views['now']['bot'])) . '";');
+					}
+				} else {
+					$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views"');
+					if( in_array(3, $gt) ) {
+					  echo('document.getElementById("wppvp_gt_3").innerHTML="' . ($total_views) . '";');
+					}
+					if( in_array(4, $gt) ) {
+					  echo('document.getElementById("wppvp_gt_4").innerHTML="' . ($total_views+array_sum($this->views['now']['user'])+array_sum($this->views['now']['bot'])) . '";');
+					}
 				}
 			}
 		}
-	} else {
-		$bot = true;
+*/	}
+	function update() {
+	  $this->botAgent['now'] = s2a(get_option('PV+_botagent'));
+   	$this->pv_option['now'] = get_option('PV+_option');
+		$this->views['now'] = get_option('PV+_views');
 	}
-	if( !$bot && $add==1 ) {
-		$PV_useragent = s2a(get_option('PV+_useragent'));
-		if( !in_array($useragent, $PV_useragent) ) {
-			$PV_useragent[] = $useragent;
-			update_option('PV+_useragent', a2s($PV_useragent));
-		}
-	}
-	return $bot;
 }
+
+$pv_data = new wppvp;
 
 function wp_snippet_chars($text, $length = 0) {
 	if( function_exists('mb_internal_encoding') ) {
@@ -79,61 +278,43 @@ function wp_snippet_chars($text, $length = 0) {
 	}
 }
 
-if( is_admin() ) {
-	add_action('activate_wp-postviews-plus/postviews_plus.php', 'postviews_plus_add');
-	add_action('admin_menu', 'postviews_plus_option');
-} else {
-	add_action('loop_start', 'process_postviews');
+// Function: WP-PostViews Plus Option Menu
+add_action('admin_menu', 'postviews_plus_option');
+function postviews_plus_option() {
+	if (function_exists('add_options_page')) {
+		// Loading language file...
+		$currentLocale = get_locale();
+		if( !empty($currentLocale) ) {
+			$moFile = dirname(__FILE__).'/postviews_plus-'.$currentLocale.'.mo';
+			if( @file_exists($moFile) && is_readable($moFile) ) {
+				load_textdomain('postviews_plus', $moFile);
+			}
+		}
+		add_options_page('WP-PostViews Plus', 'PostViews+', 'manage_options', dirname(__FILE__).'/postviews_plus_admin.php');
+	}
 }
 
 // Function: Calculate Post Views
-function process_postviews($content) {
-	static $postid = array();
-	$pv_option = get_option('PV+_option');
-	if( !is_user_logged_in() || $pv_option['userlogoin']==1 ) {
-		if( is_home() ) {
-			$views = get_option('PV+_views');
-			if( check_bot($pv_option['getuseragent']) ) {
-				$views['bot']['index'] += 1;
+add_action('loop_start', 'process_postviews');
+function process_postviews() {
+	global $post, $pv_data;
+	if( !wp_is_post_revision($post) ) {
+		if( !is_user_logged_in() || $pv_data->pv_option['now']['userlogoin']==1 ) {
+			$pv_data->add_count_data();
+			if( defined('WP_CACHE') && WP_CACHE ) {
+				echo("\n" . '<!-- Start Of Script Generated By WP-PostViews Plus 1.1.18 -->' . "\n");
+				wp_print_scripts('jquery');
+				echo('<script type="text/javascript">' . "\n");
+				echo('/* <![CDATA[ */' . "\n");
+				echo("jQuery.ajax({type:'GET',url:'" . plugins_url('wp-postviews-plus/postviews_plus.php') . "',data:'todowppvp=&type=" . $pv_data->count_type . "&id=" . $pv_data->count_id . "',cache:false,dataType:'script'});");
+				echo('/* ]]> */' . "\n");
+				echo('</script>' . "\n");
+				echo('<!-- End Of Script Generated By WP-PostViews Plus 1.1.18 -->' . "\n");
 			} else {
-				$views['user']['index'] += 1;
+			  $pv_data->increment_views();
 			}
-			update_option('PV+_views', $views);
-		} elseif( is_single() || is_page() ) {
-			global $post;
-			if( !in_array($id, $postid) ) {
-				$postid[] = $post->ID;
-				if( check_bot($pv_option['getuseragent']) ) {
-					$post_bot_views = intval(get_post_meta($post->ID, 'bot_views', true));
-					if( !update_post_meta($post->ID, 'bot_views', ($post_bot_views+1)) ) {
-						add_post_meta($post->ID, 'bot_views', 1, true);
-					}
-				} else {
-					$post_views = intval(get_post_meta($post->ID, 'views', true));
-					if( !update_post_meta($post->ID, 'views', ($post_views+1)) ) {
-						add_post_meta($post->ID, 'views', 1, true);
-					}
-				}
-			}
-		} elseif( is_category() ) {
-			$views = get_option('PV+_views');
-			if( check_bot($pv_option['getuseragent']) ) {
-				$views['bot']['cat_' . intval(get_query_var('cat'))] += 1;
-			} else {
-				$views['user']['cat_' . intval(get_query_var('cat'))] += 1;
-			}
-			update_option('PV+_views', $views);
-		} elseif( is_tag() ) {
-			$views = get_option('PV+_views');
-			if( check_bot($pv_option['getuseragent']) ) {
-				$views['bot']['tag_' . intval(get_query_var('tag_id'))] += 1;
-			} else {
-				$views['user']['tag_' . intval(get_query_var('tag_id'))] += 1;
-			}
-			update_option('PV+_views', $views);
 		}
 	}
-	return $content;
 }
 
 // Function: Display The Post Total Views
@@ -141,7 +322,11 @@ function the_views($text_views=' Views', $display=true) {
 	global $post;
 	$post_views = intval(get_post_meta($post->ID, 'views', true)) + intval(get_post_meta($post->ID, 'bot_views', true));
 	if( $display ) {
-		echo number_format($post_views).$text_views;
+		echo('<span id="wppvp_tv_' . $post->ID . '">' . number_format($post_views) . '</span>' . $text_views);
+		if( defined('WP_CACHE') && WP_CACHE ) {
+			global $pv_data;
+			$pv_data->add_cache_stats('tv');
+		}
 	} else {
 		return $post_views;
 	}
@@ -152,7 +337,11 @@ function the_user_views($text_views=' User Views', $display=true) {
 	global $post;
 	$post_user_views = intval(get_post_meta($post->ID, 'views', true));
 	if( $display ) {
-		echo number_format($post_user_views).$text_views;
+		echo('<span id="wppvp_tuv_' . $post->ID . '">' . number_format($post_user_views) . '</span>' . $text_views);
+		if( defined('WP_CACHE') && WP_CACHE ) {
+			global $pv_data;
+			$pv_data->add_cache_stats('tuv');
+		}
 	} else {
 		return $post_user_views;
 	}
@@ -163,7 +352,11 @@ function the_bot_views($text_views=' Bot Views', $display=true) {
 	global $post;
 	$post_bot_views = intval(get_post_meta($post->ID, 'bot_views', true));
 	if( $display ) {
-		echo number_format($post_bot_views).$text_views;
+		echo('<span id="wppvp_tbv_' . $post->ID . '">' . number_format($post_bot_views) . '</span>' . $text_views);
+		if( defined('WP_CACHE') && WP_CACHE ) {
+			global $pv_data;
+			$pv_data->add_cache_stats('tbv');
+		}
 	} else {
 		return $post_bot_views;
 	}
@@ -182,25 +375,26 @@ function get_most_viewed($mode='', $limit=10, $chars=0, $display=true, $with_bot
 		$where = '(p.post_type = "post" OR p.post_type = "page")';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN ' . $wpdb->postmeta . ' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_status = "publish" AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_status = "publish" AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
 		$output = '';
-		foreach($most_views as $most_view) {
+		foreach( $most_views as $most_view ) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
+			$post_link = '<a href="' . get_permalink($most_view->ID) . '">' . wp_snippet_chars($post_title, $chars) . '</a>';
+			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
+			$output .= '<li>' . sprintf($output_format, $post_views, $post_link, $post_date) . '</li>' . "\n";
 		}
 	} else {
-		$output = '<li>'.__('N/A', 'wp-postviews_plus').'</li>';
+		$output = '<li>' . __('N/A', 'wp-postviews_plus') . '</li>';
 	}
 	if( $display ) {
-		echo $output;
+		echo($output);
 	} else {
 		return $output;
 	}
@@ -221,39 +415,40 @@ function get_most_viewed_category($category_id=1, $mode='', $limit=10, $chars=0,
 		$category_sql = 'tr.term_taxonomy_id IN (';
 		$category = get_the_category($post->ID);
 		foreach( $category AS $cate )	{
-			$category_sql .= $cate->term_taxonomy_id.',';
+			$category_sql .= $cate->term_taxonomy_id . ', ';
 		}
 		$category_sql = substr($category_sql, 0, -1);
 		$category_sql .= ')';
 	} else {
 		if( is_array($category_id) ) {
-			$term_id = 'term_id IN ('.join(',', $category_id).')';
+			$term_id = 'term_id IN (' . join(', ', $category_id) . ')';
 		} else {
-			$term_id = 'term_id = '.$category_id;
+			$term_id = 'term_id = ' . $category_id;
 		}
-		$ttid = $wpdb->get_col("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE $term_id");
-		$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
+		$ttid = $wpdb->get_col('SELECT term_taxonomy_id FROM ' . $wpdb->term_taxonomy . ' WHERE ' . $term_id);
+		$category_sql = 'tr.term_taxonomy_id IN (' . join(', ', $ttid) . ')';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN ' . $wpdb->postmeta . ' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN ' . $wpdb->term_relationships . ' AS tr ON tr.object_id = p.ID WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_status = "publish" AND ' . $category_sql . ' AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN ' . $wpdb->term_relationships . ' AS tr ON tr.object_id = p.ID WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_status = "publish" AND ' . $category_sql . ' AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
 		$output = '';
-		foreach ($most_views as $most_view) {
+		foreach( $most_views as $most_view ) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
+			$post_link = '<a href="' . get_permalink($most_view->ID) . '">' . wp_snippet_chars($post_title, $chars) . '</a>';
+			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
+			$output .= '<li>' . sprintf($output_format, $post_views, $post_link, $post_date) . '</li>' . "\n";
 		}
 	} else {
-		$output = '<li>'.__('N/A', 'wp-postviews_plus').'</li>'."\n";
+		$output = '<li>' . __('N/A', 'wp-postviews_plus') . '</li>' . "\n";
 	}
-	if($display) {
-		echo $output;
+	if( $display ) {
+		echo($output);
 	} else {
 		return $output;
 	}
@@ -275,25 +470,26 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 		$where = '(p.post_type = "post" OR p.post_type = "page")';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN ' . $wpdb->postmeta . ' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_date > "' . $limit_date . '" AND p.post_status = "publish" AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_date > "' . $limit_date . '" AND p.post_status = "publish" AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
 		$output = '';
-		foreach($most_views as $most_view) {
+		foreach( $most_views as $most_view ) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
+			$post_link = '<a href="' . get_permalink($most_view->ID) . '">' . wp_snippet_chars($post_title, $chars) . '</a>';
+			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
+			$output .= '<li>' . sprintf($output_format, $post_views, $post_link, $post_date) . '</li>' . "\n";
 		}
 	} else {
-		$output = '<li>'.__('N/A', 'postviews_plus').'</li>'."\n";
+		$output = '<li>' . __('N/A', 'postviews_plus') . '</li>' . "\n";
 	}
 	if( $display ) {
-		echo $output;
+		echo($output);
 	} else {
 		return $output;
 	}
@@ -301,7 +497,7 @@ function get_timespan_most_viewed($mode='', $limit=10, $days=7, $display=true, $
 
 ### Function: Get TimeSpan Most Viewed By Category
 function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days=7, $display=true, $with_bot=true, $chars=0) {
-	global $wpdb, $post;	
+	global $wpdb, $post;
 	$limit_date = current_time('timestamp') - ($days*86400);
 	$limit_date = date('Y-m-d H:i:s', $limit_date);
 	$output_format = get_option('PV+_option');
@@ -316,93 +512,90 @@ function get_timespan_most_viewed_cat($category_id=1, $mode='', $limit=10, $days
 		$category_sql = 'tr.term_taxonomy_id IN (';
 		$category = get_the_category($post->ID);
 		foreach( $category AS $cate )	{
-			$category_sql .= $cate->term_taxonomy_id.',';
+			$category_sql .= $cate->term_taxonomy_id.', ';
 		}
 		$category_sql = substr($category_sql, 0, -1);
 		$category_sql .= ')';
 	} else {
 		if( is_array($category_id) ) {
-			$term_id = 'term_id IN ('.join(',', $category_id).')';
+			$term_id = 'term_id IN (' . join(', ', $category_id) . ')';
 		} else {
-			$term_id = 'term_id = '.$category_id;
+			$term_id = 'term_id = ' . $category_id;
 		}
-		$ttid = $wpdb->get_col("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE $term_id");
-		$category_sql = 'tr.term_taxonomy_id IN ('.join(',', $ttid).')';
+		$ttid = $wpdb->get_col('SELECT term_taxonomy_id FROM ' . $wpdb->term_taxonomy . ' WHERE ' . $term_id);
+		$category_sql = 'tr.term_taxonomy_id IN (' . join(', ', $ttid) . ')';
 	}
 	if( $with_bot ) {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN '.$wpdb->postmeta.' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, (IFNULL(CAST(pm1.meta_value AS UNSIGNED), 0) + IFNULL(CAST(pm2.meta_value AS UNSIGNED), 0)) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm1 ON pm1.post_id = p.ID AND pm1.meta_key = "views" LEFT JOIN ' . $wpdb->postmeta . ' AS pm2 ON pm2.post_id = p.ID AND pm2.meta_key = "bot_views" LEFT JOIN ' . $wpdb->term_relationships . ' AS tr ON tr.object_id = p.ID WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_date > "' . $limit_date . '" AND p.post_status = "publish" AND ' . $category_sql . ' AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsbot'];
 	} else {
-		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM '.$wpdb->posts.' AS p LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN '.$wpdb->term_relationships.' AS tr ON tr.object_id = p.ID WHERE p.post_date < "'.current_time('mysql').'" AND p.post_date > "'.$limit_date.'" AND p.post_status = "publish" AND '.$category_sql.' AND '.$where.' AND p.post_password = "" ORDER BY views DESC LIMIT '.$limit);
+		$most_views = $wpdb->get_results('SELECT p.ID, p.post_title, IFNULL(CAST(pm.meta_value AS UNSIGNED), 0) AS views FROM ' . $wpdb->posts . ' AS p LEFT JOIN ' . $wpdb->postmeta . ' AS pm ON pm.post_id = p.ID AND pm.meta_key = "views" LEFT JOIN ' . $wpdb->term_relationships . ' AS tr ON tr.object_id = p.ID WHERE p.post_date < "' . current_time('mysql') . '" AND p.post_date > "' . $limit_date . '" AND p.post_status = "publish" AND ' . $category_sql . ' AND ' . $where . ' AND p.post_password = "" ORDER BY views DESC LIMIT ' . $limit);
 		$output_format = $output_format['mostviewsnobot'];
 	}
 	if( $most_views ) {
 		$output = '';
-		foreach ($most_views as $most_view) {
+		foreach( $most_views as $most_view ) {
 			$post_title = $most_view->post_title;
 			$post_views = number_format(intval($most_view->views));
-			$link = '<a href="'.get_permalink($most_view->ID).'">'.wp_snippet_chars($post_title, $chars).'</a>';
-			$output .= '<li>'.sprintf($output_format, $post_views, $link).'</li>'."\n";
+			$post_link = '<a href="' . get_permalink($most_view->ID) . '">' . wp_snippet_chars($post_title, $chars) . '</a>';
+			$post_date = get_the_time(get_option('date_format'), $most_view->ID);
+			$output .= '<li>' . sprintf($output_format, $post_views, $post_link, $post_date) . '</li>' . "\n";
 		}
 	} else {
-		$output = '<li>'.__('N/A', 'postviews_plus').'</li>'."\n";
+		$output = '<li>' . __('N/A', 'postviews_plus') . '</li>' . "\n";
 	}
 	if( $display ) {
-		echo $output;
+		echo($output);
 	} else {
 		return $output;
 	}
 }
 
 // Function: Display Total Views
-function get_totalviews($display=true, $with_bot=true) {
-	global $wpdb;
-	$views = get_option('PV+_views');
+function get_totalviews($display=true, $with_bot=true, $with_post=true) {
+	global $wpdb, $pv_data;
 	if( $with_bot ) {
-		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views" OR meta_key = "bot_views"');
+		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views" OR meta_key = "bot_views"');
+		$type = 1;
 		if( $with_post ) {
-			$total_views += array_sum($views['user']) + array_sum($views['bot']);
+			$total_views += array_sum($pv_data->views['now']['user']) + array_sum($pv_data->views['now']['bot']);
+			$type = 2;
 		}
 	} else {
-		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM '.$wpdb->postmeta.' WHERE meta_key = "views"');
+		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views"');
+		$type = 3;
 		if( $with_post ) {
-			$total_views += array_sum($views['user']);
+			$total_views += array_sum($pv_data->views['now']['user']);
+			$type = 4;
 		}
 	}
 	if( $display ) {
-		echo number_format($total_views);
+		echo('<span id="wppvp_gt_' . $type . '">' . number_format($total_views) . '</span>');
+		if( defined('WP_CACHE') && WP_CACHE ) {
+			$pv_data->add_cache_stats('gt' . $type);
+		}
 	} else {
 		return $total_views;
 	}
 }
 
 // Function: Add Option Value
+register_activation_hook(__FILE__, 'postviews_plus_add');
 function postviews_plus_add() {
-	global $wpdb;
-	$botAgent = array('bot','spider','validator','google');
-	$pv_option = array('getuseragent'=>0, 'userlogoin'=>0, 'reportbot'=>1, 'mostviewsbot'=>'%2$s - %1$s '.__('Views', 'postviews_plus'), 'mostviewsnobot'=>'%2$s - %1$s '.__('User Views', 'postviews_plus'));
-	$views = array('user'=>array(), 'bot'=>array());
-	add_option('PV+_botagent', a2s($botAgent));
-	add_option('PV+_option', $pv_option);
+	global $wpdb, $pv_data;
+	add_option('PV+_botagent', a2s($pv_data->botAgent['def']));
+	add_option('PV+_option', $pv_data->pv_option['def']);
 	add_option('PV+_useragent', '');
-	add_option('PV+_views', $views);
+	add_option('PV+_views', $pv_data->views['def']);
+/*	$wpdb->query('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviewsplus (
+	`count_type` VARCHAR(10) NOT NULL DEFAULT "",
+	`count_id` VARCHAR(10) NOT NULL DEFAULT "",
+	`tv` VARCHAR(255) NOT NULL DEFAULT "",
+	`tuv` VARCHAR(255) NOT NULL DEFAULT "",
+	`tbv` VARCHAR(255) NOT NULL DEFAULT "",
+	`gt` VARCHAR(255) NOT NULL DEFAULT "",
+	PRIMARY KEY (`count_type`, `count_id`)
+)');*/
 }
-function postviews_plus_option() {
-	if( function_exists('add_options_page') ) {
-		// Loading language file...
-		$currentLocale = get_locale();
-		if( !empty($currentLocale) ) {
-			$moFile = dirname(__FILE__).'/postviews_plus-'.$currentLocale.'.mo';
-			if( @file_exists($moFile) && is_readable($moFile) ) {
-				load_textdomain('postviews_plus', $moFile);
-			}
-		}
-		include dirname (__FILE__).'/postviews_plus_admin.php';
-		if( IS_WP25 ) {
-			add_options_page('WP-PostViews Plus', 'PostViews+', 'manage_options', dirname(__FILE__), 'postviews_plus_option_page_25');
-		} else {
-			add_options_page('WP-PostViews Plus', 'PostViews+', 'manage_options', dirname(__FILE__), 'postviews_plus_option_page');
-		}
-	}
-}
+
 ?>
