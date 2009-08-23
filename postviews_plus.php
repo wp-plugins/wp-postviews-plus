@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.18
+Version: 1.1.19
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -58,6 +58,7 @@ class wppvp{
 	var $count_type;
 	var $count_bot;
 	var $did_id;
+	var $cache_stats;
 
 	function wppvp () {
 	  $this->botAgent = array(
@@ -80,16 +81,13 @@ class wppvp{
 				'user' => array(),
 				'bot' => array()));
 		$this->did_id = array();
+		$this->cache_stats = true;
 
 		if( isset($_GET['todowppvp']) && defined('WP_CACHE') && WP_CACHE ) {
 			$this->add_count_data();
 			$this->increment_views();
 			$this->change_views();
 			echo("\r\n");
-//			global $user_level;
-//			if( $user_level>8 ) {
-//				echo('alert("' . get_num_queries() . ' queries. ' . timer_stop(0) . ' seconds.");');
-//			}
 		}
 	}
 	function is_bot() {
@@ -183,51 +181,71 @@ class wppvp{
 		}
 	}
 	function add_cache_stats($addin) {
-/*	  global $wpdb, $post;
+	  global $wpdb, $post;
+	  if( $this->cache_stats ) {
+	    $sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET tv="", gt=""  WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+	    $wpdb->query($sql);
+	    $this->cache_stats = false;
+	  }
 	  $sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 		$data = $wpdb->get_row($sql);
 		if( $data ) {
 		  switch( $addin ) {
 			  case 'tv':
-			  case 'tuv':
-			  case 'tbv':
-			    $temp = s2a($data->$addin);
-			    $temp[] = $post->ID;
-					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET ' . $addin .'="' . a2s($temp) . '"  WHERE count_type="' . $this-> count_type . '" AND count_id="' . $this->count_id . '"';
+			    if( $data->tv=='' ) {
+			    	$temp = array($post->ID);
+					} else {
+						$temp = explode(',', $data->tv);
+						if( !in_array($post->ID, $temp) ) {
+							$temp[] = $post->ID;
+						}
+					}
+					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET tv="' . implode(',', $temp) . '"  WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 					break;
 				case 'gt1':
 				case 'gt2':
 				case 'gt3':
 				case 'gt4':
-				  $temp = s2a($this->gt);
-			    $temp[] = $addin[2];
-					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET gt="' . a2s($temp) . '" WHERE count_type="' . $this-> count_type . '" AND count_id="' . $this->count_id . '"';
+				  if( count($temp)==0 ) {
+			    	$temp = array($addin[2]);
+					} else {
+					  $temp = explode(',', $data->gt);
+						$temp[] = $addin[2];
+					}
+					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET gt="' . implode(',', $temp) . '" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 					break;
 			}
 		} else {
 			switch( $addin ) {
 			  case 'tv':
-			  case 'tuv':
-			  case 'tbv':
-					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, ' . $addin .') VALUES ("' . $this-> count_type . '", "' . $this->count_id . '", "' . $post->ID . '")';
+					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, tv) VALUES ("' . $this->count_type . '", "' . $this->count_id . '", "' . $post->ID . '")';
 					break;
 				case 'gt1':
 				case 'gt2':
 				case 'gt3':
 				case 'gt4':
-					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, gt) VALUES ("' . $this-> count_type . '", "' . $this->count_id . '", "' . $addin[2] . '")';
+					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, gt) VALUES ("' . $this->count_type . '", "' . $this->count_id . '", "' . $addin[2] . '")';
 					break;
 			}
 		}
 		$wpdb->query($sql);
-*/	}
+	}
 	function change_views() {
-/*	  global $wpdb;
+	  global $wpdb;
 	 	$sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 		$data = $wpdb->get_row($sql);
 		if( $data ) {
-		  $gt = s2a($data->gt);
-	  	if( count($gt)>0 ) {
+			if( $data->tv!='' ) {
+				$sql = 'SELECT pmu.post_id, IFNULL(pmu.meta_value, 0) AS user_views, IFNULL(pmb.meta_value, 0) AS bot_views FROM ' . $wpdb->postmeta . ' AS pmu LEFT JOIN ' . $wpdb->postmeta . ' AS pmb ON pmb.post_id=pmu.post_id AND pmb.meta_key="bot_views" WHERE pmu.meta_key="views" AND pmu.post_id IN (' . $data->tv . ')';
+				$views = $wpdb->get_results($sql);
+				foreach( $views AS $view ) {
+				  echo('if(document.getElementById("wppvp_tv_' . $view->post_id . '")){document.getElementById("wppvp_tv_' . $view->post_id . '").innerHTML="' . ($view->user_views + $view->bot_views) . '";}');
+				  echo('if(document.getElementById("wppvp_tuv_' . $view->post_id . '")){document.getElementById("wppvp_tuv_' . $view->post_id . '").innerHTML="' . ($view->user_views) . '";}');
+				  echo('if(document.getElementById("wppvp_tbv_' . $view->post_id . '")){document.getElementById("wppvp_tbv_' . $view->post_id . '").innerHTML="' . ($view->bot_views) . '";}');
+				}
+			}
+			if( $data->gt!='' ) {
+				$gt = explode(',', $data->gt);
 				if( in_array(1, $gt) || in_array(2, $gt) ) {
 					$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views" OR meta_key = "bot_views"');
 					if( in_array(1, $gt) ) {
@@ -247,7 +265,7 @@ class wppvp{
 				}
 			}
 		}
-*/	}
+	}
 	function update() {
 	  $this->botAgent['now'] = s2a(get_option('PV+_botagent'));
    	$this->pv_option['now'] = get_option('PV+_option');
@@ -299,8 +317,8 @@ add_action('loop_start', 'process_postviews');
 function process_postviews() {
 	global $post, $pv_data;
 	if( !wp_is_post_revision($post) ) {
+	  $pv_data->add_count_data();
 		if( !is_user_logged_in() || $pv_data->pv_option['now']['userlogoin']==1 ) {
-			$pv_data->add_count_data();
 			if( defined('WP_CACHE') && WP_CACHE ) {
 				echo("\n" . '<!-- Start Of Script Generated By WP-PostViews Plus 1.1.18 -->' . "\n");
 				wp_print_scripts('jquery');
@@ -340,7 +358,7 @@ function the_user_views($text_views=' User Views', $display=true) {
 		echo('<span id="wppvp_tuv_' . $post->ID . '">' . number_format($post_user_views) . '</span>' . $text_views);
 		if( defined('WP_CACHE') && WP_CACHE ) {
 			global $pv_data;
-			$pv_data->add_cache_stats('tuv');
+			$pv_data->add_cache_stats('tv');
 		}
 	} else {
 		return $post_user_views;
@@ -355,7 +373,7 @@ function the_bot_views($text_views=' Bot Views', $display=true) {
 		echo('<span id="wppvp_tbv_' . $post->ID . '">' . number_format($post_bot_views) . '</span>' . $text_views);
 		if( defined('WP_CACHE') && WP_CACHE ) {
 			global $pv_data;
-			$pv_data->add_cache_stats('tbv');
+			$pv_data->add_cache_stats('tv');
 		}
 	} else {
 		return $post_bot_views;
@@ -587,15 +605,13 @@ function postviews_plus_add() {
 	add_option('PV+_option', $pv_data->pv_option['def']);
 	add_option('PV+_useragent', '');
 	add_option('PV+_views', $pv_data->views['def']);
-/*	$wpdb->query('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviewsplus (
+	$wpdb->query('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviewsplus (
 	`count_type` VARCHAR(10) NOT NULL DEFAULT "",
 	`count_id` VARCHAR(10) NOT NULL DEFAULT "",
 	`tv` VARCHAR(255) NOT NULL DEFAULT "",
-	`tuv` VARCHAR(255) NOT NULL DEFAULT "",
-	`tbv` VARCHAR(255) NOT NULL DEFAULT "",
 	`gt` VARCHAR(255) NOT NULL DEFAULT "",
 	PRIMARY KEY (`count_type`, `count_id`)
-)');*/
+)');
 }
 
 ?>
