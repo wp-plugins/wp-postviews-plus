@@ -8,6 +8,7 @@ if( isset($_POST['update_pvp']) ) {
 		$pv_option['reportbot'] = intval($_POST['reportbot'])==1 ? 1 : 0;
 		$pv_option['mostviewsbot'] = addslashes(trim($_POST['mostviewsbot']));
 		$pv_option['mostviewsnobot'] = addslashes(trim($_POST['mostviewsnobot']));
+		$pv_option['iptime'] = intval(trim($_POST['iptime']));
 		if( update_option('PV+_option', $pv_option) ) {
 			$text .= '<font color="green">'.__('Update Option Success' ,'postviews_plus').'</font><br />';
 		}
@@ -17,6 +18,7 @@ if( isset($_POST['update_pvp']) ) {
 		}
 	} elseif( isset($_POST['reset_pv']) ) {
 	  update_option('PV+_views', $pv_data->views['def']);
+ 		$wpdb->query('UPDATE ' . $wpdb->prefix . 'postviewsplus SET look_ip="", look_ip_time="' . (time()+7200) . '" WHERE 1');
 		if( $wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_key = 'views' OR meta_key = 'bot_views'") ) {
 			$text .= '<font color="green">'.__('Reset Post View Timws Success' ,'postviews_plus').'</font>';
 		}
@@ -57,8 +59,9 @@ echo '<div class="wrap"><h2>WP-PostViews Plus</h2>';
 echo '<form method="post" action=""><input type="hidden" name="update_pvp" value="" /><table class="form-table">';
 echo '<tr valign="top"><th scope="row">'.__('Options' ,'postviews_plus').'</th>';
 echo '<td><input name="getuseragent" type="checkbox" value="1" '.($pv_data->pv_option['now']['getuseragent']?'checked="checked"':'').'/> '.__('Remember the User_agent Of User.' ,'postviews_plus').'<br />';
-echo '<input name="userlogoin" type="checkbox" value="1" '.($pv_data->pv_option['now']['userlogoin']?'checked="checked"':'').'/> '.__('Add Views number if User is logoin.' ,'postviews_plus').'<br />';
+echo '<input name="userlogoin" type="checkbox" value="1" '.($pv_data->pv_option['now']['userlogoin']?'checked="checked"':'').'/> '.__('Add views number if User is logoin.' ,'postviews_plus').'<br />';
 echo '<input name="reportbot" type="checkbox" value="1" '.($pv_data->pv_option['now']['reportbot']?'checked="checked"':'').'/> '.__('Report BOT User_agent when update.' ,'postviews_plus').'<br />';
+printf('<br />'.__('In every %s minute is redundant IP does not calculate views number.', 'postviews_plus').'<br />', '<input name="iptime" type="text" value="'.$pv_data->pv_option['now']['iptime'].'" size="5" />');
 echo '<br />'.__('Output format of most views. (%1$s: Views number. %2$s: Post link. %3$s: Post Date.)' ,'postviews_plus').'<br /><input name="mostviewsbot" type="text" value="'.$pv_data->pv_option['now']['mostviewsbot'].'" size="30" />'.__('with bot views.' ,'postviews_plus').'<br />';
 echo '<input name="mostviewsnobot" type="text" value="'.$pv_data->pv_option['now']['mostviewsnobot'].'" size="30" />'.__('without bot views.' ,'postviews_plus');
 echo '<p class="submit"><input type="submit" name="update_op" class="button" value="'.__('Update Options' ,'postviews_plus').'" /><input type="submit" name="reset_op" class="button" value="'.__('Reset Option' ,'postviews_plus').'" /><input type="submit" name="reset_pv" class="button" value="'.__('Reset Post Views' ,'postviews_plus').'" /></p>';

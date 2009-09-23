@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-07 21:03+0800\n"
-"PO-Revision-Date: 2009-08-07 21:03+0800\n"
+"POT-Creation-Date: 2009-09-22 23:25+0800\n"
+"PO-Revision-Date: 2009-09-22 23:29+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <fantasyworldidvtw@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -15,18 +15,18 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: postviews_plus.php:64
+#: postviews_plus.php:80
 msgid "Views"
 msgstr "瀏覽數"
 
-#: postviews_plus.php:65
+#: postviews_plus.php:81
 msgid "User Views"
 msgstr "使用者瀏覽數"
 
-#: postviews_plus.php:294
-#: postviews_plus.php:348
-#: postviews_plus.php:389
-#: postviews_plus.php:445
+#: postviews_plus.php:453
+#: postviews_plus.php:507
+#: postviews_plus.php:548
+#: postviews_plus.php:604
 msgid "N/A"
 msgstr "沒有文章"
 
@@ -38,94 +38,99 @@ msgstr "成功的更新設定"
 msgid "Reset Options Success"
 msgstr "成功的重置設定"
 
-#: postviews_plus_admin.php:21
+#: postviews_plus_admin.php:22
 msgid "Reset Post View Timws Success"
 msgstr "成功的重置瀏覽數"
 
-#: postviews_plus_admin.php:25
+#: postviews_plus_admin.php:26
 msgid "Cleared User User_agent Success"
-msgstr "成功的清除使用者的User_agent"
+msgstr "成功的清除使用者的 User_agent"
 
-#: postviews_plus_admin.php:30
+#: postviews_plus_admin.php:31
 msgid "Update BOT User_agent Success"
-msgstr "成功的更新機器人的User_agent"
+msgstr "成功的更新機器人的 User_agent"
 
 #: postviews_plus_admin.php:39
 msgid "Report BOT User_agent Success"
-msgstr "成功的回報機器人的User_agent"
+msgstr "成功的回報機器人的 User_agent"
 
 #: postviews_plus_admin.php:41
 msgid "Report BOT User_agent Fail"
-msgstr "失敗的回報機器人的User_agent"
+msgstr "失敗的回報機器人的 User_agent"
 
 #: postviews_plus_admin.php:47
 msgid "Reset Bot User_agent Success"
-msgstr "成功的重置機器人的User_agent"
+msgstr "成功的重置機器人的 User_agent"
 
-#: postviews_plus_admin.php:61
+#: postviews_plus_admin.php:59
 msgid "Options"
 msgstr "設定"
 
-#: postviews_plus_admin.php:62
+#: postviews_plus_admin.php:60
 msgid "Remember the User_agent Of User."
-msgstr "記住訪客的User_agent."
+msgstr "記住訪客的 User_agent."
 
-#: postviews_plus_admin.php:63
-msgid "Add Views number if User is logoin."
+#: postviews_plus_admin.php:61
+msgid "Add views number if User is logoin."
 msgstr "當使用者登入後也計算文章閱覽數."
 
-#: postviews_plus_admin.php:64
+#: postviews_plus_admin.php:62
 msgid "Report BOT User_agent when update."
-msgstr "在更新機器人的User_agent之時回報"
+msgstr "在更新機器人的 User_agent 之時回報"
 
-#: postviews_plus_admin.php:65
+#: postviews_plus_admin.php:63
+#, php-format
+msgid "In every %s minute is redundant IP does not calculate views number."
+msgstr "每 %s 分鐘內重複的 IP 不計算瀏覽數."
+
+#: postviews_plus_admin.php:64
 #, php-format
 msgid "Output format of most views. (%1$s: Views number. %2$s: Post link. %3$s: Post Date.)"
 msgstr "最多人瀏覽的輸出格式. (%1$s:瀏覽數. %2$s: 文章連結. %3$s:發文日期)"
 
-#: postviews_plus_admin.php:65
+#: postviews_plus_admin.php:64
 msgid "with bot views."
 msgstr "包含機器人."
 
-#: postviews_plus_admin.php:66
+#: postviews_plus_admin.php:65
 msgid "without bot views."
 msgstr "不包含機器人."
 
-#: postviews_plus_admin.php:67
+#: postviews_plus_admin.php:66
 msgid "Update Options"
 msgstr "更新設定"
 
-#: postviews_plus_admin.php:67
+#: postviews_plus_admin.php:66
 msgid "Reset Option"
 msgstr "重置設定"
 
-#: postviews_plus_admin.php:67
+#: postviews_plus_admin.php:66
 msgid "Reset Post Views"
 msgstr "重置瀏覽數"
 
 #: postviews_plus_admin.php:70
 msgid "User User_agent"
-msgstr "使用者的User_agent"
+msgstr "使用者的 User_agent"
 
 #: postviews_plus_admin.php:72
 msgid "Clear User User_agent record"
-msgstr "清除使用者的User_agent紀錄"
+msgstr "清除使用者的 User_agent 紀錄"
 
 #: postviews_plus_admin.php:75
 msgid "Bot User_agent"
-msgstr "機器人的User_agent"
+msgstr "機器人的 User_agent"
 
 #: postviews_plus_admin.php:76
 msgid "Here are a list of Bot User_agent. Start each User_agent on a new line."
-msgstr "這是監測機器人所使用的User_agent的清單.每一個User_agent在一行."
+msgstr "這是監測機器人所使用的 User_agent 的清單.每一個 User_agent 在一行."
 
 #: postviews_plus_admin.php:77
 msgid "Update BOT User_agent"
-msgstr "更新機器人的User_agent"
+msgstr "更新機器人的 User_agent"
 
 #: postviews_plus_admin.php:77
 msgid "Reset BOT User_agent"
-msgstr "重置機器人的User_agent"
+msgstr "重置機器人的 User_agent"
 
 #~ msgid "Add Views number in Blog Index Page."
 #~ msgstr "在部落格首頁的閱覽計算在文章閱覽數內."
