@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.20
+Version: 1.1.21
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -647,9 +647,9 @@ function postviews_plus_add() {
 	  $pv_data = new wppvp;
 	}
 	add_option('PV+_botagent', a2s($pv_data->botAgent['def']));
-	update_option('PV+_botagent', a2s(array_merge(array_diff($pv_data->botAgent['def'], $pv_data->botAgent['now']), $pv_data->botAgent['now'])));
+	//update_option('PV+_botagent', a2s(array_merge(array_diff($pv_data->botAgent['def'], $pv_data->botAgent['now']), $pv_data->botAgent['now'])));
 	add_option('PV+_option', $pv_data->pv_option['def']);
-	update_option('PV+_option', array_merge($pv_data->pv_option['def'] ,$pv_data->pv_option['now']));
+	//update_option('PV+_option', array_merge($pv_data->pv_option['def'] ,$pv_data->pv_option['now']));
 	add_option('PV+_useragent', '');
 	add_option('PV+_views', $pv_data->views['def']);
 	$sql = 'SHOW TABLES FROM ' . DB_NAME . ' LIKE "' . $wpdb->prefix . 'postviewsplus"';
@@ -659,15 +659,13 @@ function postviews_plus_add() {
 			`count_id` VARCHAR(10) NOT NULL,
 			`tv` VARCHAR(255) NOT NULL DEFAULT "",
 			`gt` VARCHAR(255) NOT NULL DEFAULT "",
-			`look_ip` TEXT NOT NULL DEFAULT "",
+			`look_ip` TEXT NOT NULL,
 			`look_ip_time` INT UNSIGNED NOT NULL DEFAULT "0",
-			PRIMARY KEY (`count_type`, `count_id`),
-			COMMENT = "1.1.20")');
+			PRIMARY KEY (`count_type`, `count_id`))');
 	} else {
 	  $wpdb->get_var('ALTER TABLE ' . $wpdb->prefix . 'postviewsplus
-			ADD `look_ip` TEXT NOT NULL DEFAULT "",
-			ADD `look_ip_time` INT UNSIGNED NOT NULL DEFAULT "0",
-			COMMENT = "1.1.20"');
+			ADD `look_ip` TEXT NOT NULL,
+			ADD `look_ip_time` INT UNSIGNED NOT NULL DEFAULT "0"');
 	}
 }
 ?>
