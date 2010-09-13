@@ -1,9 +1,9 @@
 === WP-PostViews Plus ===
 Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
-Requires at least: 2.3
-Tested up to: 2.9.2
-Stable tag: 1.1.21
+Requires at least: 2.5
+Tested up to: 3.0.1
+Stable tag: 1.1.22
 
 Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
