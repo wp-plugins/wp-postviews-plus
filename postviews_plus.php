@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://fantasyworld.idv.tw/programs/wp_postviews_plus/
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.1.22
+Version: 1.1.23
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -34,13 +34,13 @@ function s2a($arr_string) {
 	if( is_array($arr_string) ) {
 		return $arr_string;
 	} else {
-	  if( strlen($arr_string)>0 ) {
-	    if( strpos($arr_string, ARRAY_CAT) ) {
+		if( strlen($arr_string)>0 ) {
+			if( strpos($arr_string, ARRAY_CAT) ) {
 				return explode(ARRAY_CAT, $arr_string);
 			} else {
 				return unserialize(htmlspecialchars_decode($arr_string));
 			}
-    } else {
+		} else {
 			return array();
 		}
 	}
@@ -49,12 +49,12 @@ function a2s($arr) {
 	if( is_array($arr) ) {
 		return htmlspecialchars(serialize($arr));
 	} else {
-	  return $arr;
+		return $arr;
 	}
 }
 
 class wppvp{
-  var $botAgent;
+	var $botAgent;
 	var $pv_option;
 	var $views;
 
@@ -65,14 +65,14 @@ class wppvp{
 	var $cache_stats;
 
 	function wppvp () {
-	  $this->botAgent = array(
+		$this->botAgent = array(
 			'now' => s2a(get_option('PV+_botagent')),
 			'def' => array(
 				'bot',
 				'spider',
 				'slurp'));
-   	$this->pv_option = array(
-   	  'now' => get_option('PV+_option'),
+		$this->pv_option = array(
+			'now' => get_option('PV+_option'),
 			'def' => array(
 				'getuseragent' => 0,
 				'userlogoin' => 0,
@@ -81,7 +81,7 @@ class wppvp{
 				'mostviewsnobot' => '%3$s : %2$s - %1$s ' . __('User Views', 'postviews_plus'),
 				'iptime' => 120));
 		$this->views = array(
-		  'now' => get_option('PV+_views'),
+			'now' => get_option('PV+_views'),
 			'def' => array(
 				'user' => array('indet_1' => 0),
 				'bot' => array('indet_1' => 0)));
@@ -89,8 +89,8 @@ class wppvp{
 		$this->cache_stats = true;
 
 		if( isset($_GET['todowppvp']) && defined('WP_CACHE') && WP_CACHE ) {
-		  $this->add_count_data();
-		  if( $_GET['todowppvp']==='add' ) {
+			$this->add_count_data();
+			if( $_GET['todowppvp']==='add' ) {
 				$this->increment_views();
 			}
 			$this->change_views();
@@ -118,38 +118,38 @@ class wppvp{
 		return $bot;
 	}
 	function add_count_data() {
-	  if( isset($_GET['todowppvp']) && defined('WP_CACHE') && WP_CACHE ) {
-	    $this->count_bot = $this->is_bot() ? 'bot' : 'user';
-	    $this->count_type = htmlspecialchars(trim($_GET['type']));
-	    $this->count_id = htmlspecialchars(trim($_GET['id']));
-	  } else {
-      $this->count_bot = $this->is_bot(false) ? 'bot' : 'user';
-	    if( is_single() || is_page() ) {
-  	    global $post;
+		if( isset($_GET['todowppvp']) && defined('WP_CACHE') && WP_CACHE ) {
+			$this->count_bot = $this->is_bot() ? 'bot' : 'user';
+			$this->count_type = htmlspecialchars(trim($_GET['type']));
+			$this->count_id = htmlspecialchars(trim($_GET['id']));
+		} else {
+			$this->count_bot = $this->is_bot(false) ? 'bot' : 'user';
+			if( is_single() || is_page() ) {
+				global $post;
 				$this->count_type = 'post';
 				$this->count_id = $post->ID;
 			} elseif( is_home() ) {
 				$this->count_type = 'index';
 				$this->count_id = intval(get_query_var('paged'));
 				if( $this->count_id==0 ) {
-			  	$this->count_id = 1;
+					$this->count_id = 1;
 				}
 			} elseif( is_category() ) {
-			  $this->count_type = 'cat';
-		  	$this->count_id = intval(get_query_var('paged'));
+				$this->count_type = 'cat';
+				$this->count_id = intval(get_query_var('paged'));
 				if( $this->count_id==0 ) {
-				  $this->count_id = 1;
+					$this->count_id = 1;
 				}
 				$this->count_id = intval(get_query_var('cat')) . '_' . $this->count_id;
 			} elseif( is_tag() ) {
-			  $this->count_type = 'tag';
-			  $this->count_id = intval(get_query_var('paged'));
+				$this->count_type = 'tag';
+				$this->count_id = intval(get_query_var('paged'));
 				if( $this->count_id==0 ) {
-			  	$this->count_id = 1;
+					$this->count_id = 1;
 				}
 				$this->count_id = intval(get_query_var('tag_id')) . '_' . $this->count_id;
 			} else {
-		  	$this->count_type = $_SERVER['REQUEST_URI'];
+				$this->count_type = $_SERVER['REQUEST_URI'];
 				$this->count_id = 1;
 			}
 		}
@@ -163,31 +163,31 @@ class wppvp{
 			$iptime = $this->pv_option['now']['iptime'] * 60;
 			$sql = 'SELECT look_ip, look_ip_time FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 			$look_data = $wpdb->get_row($sql);
-			if( $look_ip==null ) {
-			  $sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, look_ip, look_ip_time) VALUES ("' . $this->count_type . '", "' . $this->count_id . '", "", "' . ($time+$iptime*1.5) . '")';
-        $wpdb->query($sql);
+			if( $look_data==null ) {
+				$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, look_ip, look_ip_time) VALUES ("' . $this->count_type . '", "' . $this->count_id . '", "", "' . ($time+$iptime*1.5) . '")';
+				$wpdb->query($sql);
 			}
 			$look_ip = s2a($look_data->look_ip);
 			if( $look_data->look_ip_time<$time ) {
-			  $time_check = $time - $iptime * 1.6;
-			  foreach( $look_ip AS $i => $t ) {
-			    if( $t<$time_check ) {
+				$time_check = $time - $iptime * 1.6;
+				foreach( $look_ip AS $i => $t ) {
+					if( $t<$time_check ) {
 						unset($look_ip[$i]);
-			    }
-			  }
-			  $sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET look_ip_time="' . ($time+$iptime*1.5) . '" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
-    		$wpdb->query($sql);
+					}
+				}
+				$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET look_ip_time="' . ($time+$iptime*1.5) . '" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+				$wpdb->query($sql);
 			}
 			$do_increment_views = false;
 			if( !isset($look_ip[$ip]) ) {
-			  $do_increment_views = true;
+				$do_increment_views = true;
 			} elseif( $look_ip[$ip]<$time ) {
-			  $do_increment_views = true;
+				$do_increment_views = true;
 			}
-		  $look_ip[$ip] = $time + $iptime;
-		  $sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET look_ip="' . a2s($look_ip) . '" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
-    	$wpdb->query($sql);
-    	if( $do_increment_views ) {
+			$look_ip[$ip] = $time + $iptime;
+			$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET look_ip="' . a2s($look_ip) . '" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+			$wpdb->query($sql);
+			if( $do_increment_views ) {
 				switch( $this->count_type ) {
 					case 'post':
 						if( $this->count_bot=='bot' ) {
@@ -196,7 +196,7 @@ class wppvp{
 								add_post_meta($this->count_id, 'bot_views', 1, true);
 							}
 						} else {
-						  $post_views = intval(get_post_meta($this->count_id, 'views', true));
+							$post_views = intval(get_post_meta($this->count_id, 'views', true));
 							if( !update_post_meta($this->count_id, 'views', ($post_views+1)) ) {
 								add_post_meta($this->count_id, 'views', 1, true);
 							}
@@ -218,7 +218,7 @@ class wppvp{
 		}
 	}
 	function change_views() {
-	  global $wpdb;
+		global $wpdb;
 	 	$sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 		$data = $wpdb->get_row($sql);
 		if( $data ) {
@@ -226,9 +226,9 @@ class wppvp{
 				$sql = 'SELECT pmu.post_id, IFNULL(pmu.meta_value, 0) AS user_views, IFNULL(pmb.meta_value, 0) AS bot_views FROM ' . $wpdb->postmeta . ' AS pmu LEFT JOIN ' . $wpdb->postmeta . ' AS pmb ON pmb.post_id=pmu.post_id AND pmb.meta_key="bot_views" WHERE pmu.meta_key="views" AND pmu.post_id IN (' . $data->tv . ')';
 				$views = $wpdb->get_results($sql);
 				foreach( $views AS $view ) {
-				  echo('if(document.getElementById("wppvp_tv_' . $view->post_id . '")){document.getElementById("wppvp_tv_' . $view->post_id . '").innerHTML="' . ($view->user_views + $view->bot_views) . '";}');
-				  echo('if(document.getElementById("wppvp_tuv_' . $view->post_id . '")){document.getElementById("wppvp_tuv_' . $view->post_id . '").innerHTML="' . ($view->user_views) . '";}');
-				  echo('if(document.getElementById("wppvp_tbv_' . $view->post_id . '")){document.getElementById("wppvp_tbv_' . $view->post_id . '").innerHTML="' . ($view->bot_views) . '";}');
+					echo('if(document.getElementById("wppvp_tv_' . $view->post_id . '")){document.getElementById("wppvp_tv_' . $view->post_id . '").innerHTML="' . ($view->user_views + $view->bot_views) . '";}');
+					echo('if(document.getElementById("wppvp_tuv_' . $view->post_id . '")){document.getElementById("wppvp_tuv_' . $view->post_id . '").innerHTML="' . ($view->user_views) . '";}');
+					echo('if(document.getElementById("wppvp_tbv_' . $view->post_id . '")){document.getElementById("wppvp_tbv_' . $view->post_id . '").innerHTML="' . ($view->bot_views) . '";}');
 				}
 			}
 			if( $data->gt!='' ) {
@@ -236,53 +236,53 @@ class wppvp{
 				if( in_array(1, $gt) || in_array(2, $gt) ) {
 					$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views" OR meta_key = "bot_views"');
 					if( in_array(1, $gt) ) {
-					  echo('document.getElementById("wppvp_gt_1").innerHTML="' . ($total_views) . '";');
+						echo('document.getElementById("wppvp_gt_1").innerHTML="' . ($total_views) . '";');
 					}
 					if( in_array(2, $gt) ) {
-					  echo('document.getElementById("wppvp_gt_2").innerHTML="' . ($total_views+array_sum($this->views['now']['user'])+array_sum($this->views['now']['bot'])) . '";');
+						echo('document.getElementById("wppvp_gt_2").innerHTML="' . ($total_views+array_sum($this->views['now']['user'])+array_sum($this->views['now']['bot'])) . '";');
 					}
 				} else {
 					$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views"');
 					if( in_array(3, $gt) ) {
-					  echo('document.getElementById("wppvp_gt_3").innerHTML="' . ($total_views) . '";');
+						echo('document.getElementById("wppvp_gt_3").innerHTML="' . ($total_views) . '";');
 					}
 					if( in_array(4, $gt) ) {
-					  echo('document.getElementById("wppvp_gt_4").innerHTML="' . ($total_views+array_sum($this->views['now']['user'])+array_sum($this->views['now']['bot'])) . '";');
+						echo('document.getElementById("wppvp_gt_4").innerHTML="' . ($total_views+array_sum($this->views['now']['user'])+array_sum($this->views['now']['bot'])) . '";');
 					}
 				}
 			}
 		}
 	}
 	function add_cache_stats($addin) {
-	  global $wpdb, $post;
-	  if( $this->cache_stats ) {
-	    $sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET tv="", gt="" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
-	    $wpdb->query($sql);
-	    $this->cache_stats = false;
-	  }
-	  $sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+		global $wpdb, $post;
+		if( $this->cache_stats ) {
+			$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET tv="", gt="" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+			$wpdb->query($sql);
+			$this->cache_stats = false;
+		}
+		$sql = 'SELECT * FROM ' . $wpdb->prefix . 'postviewsplus WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 		$data = $wpdb->get_row($sql);
 		if( $data ) {
-		  switch( $addin ) {
-			  case 'tv':
-			    if( $data->tv=='' ) {
-			    	$temp = array($post->ID);
+			switch( $addin ) {
+				case 'tv':
+					if( $data->tv=='' ) {
+						$temp = array($post->ID);
 					} else {
 						$temp = explode(',', $data->tv);
 						if( !in_array($post->ID, $temp) ) {
 							$temp[] = $post->ID;
 						}
 					}
-					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET tv="' . implode(',', $temp) . '"  WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
+					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET tv="' . implode(',', $temp) . '"WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
 					break;
 				case 'gt1':
 				case 'gt2':
 				case 'gt3':
 				case 'gt4':
-				  if( count($temp)==0 ) {
-			    	$temp = array($addin[2]);
+					if( count($temp)==0 ) {
+						$temp = array($addin[2]);
 					} else {
-					  $temp = explode(',', $data->gt);
+						$temp = explode(',', $data->gt);
 						$temp[] = $addin[2];
 					}
 					$sql = 'UPDATE ' . $wpdb->prefix . 'postviewsplus SET gt="' . implode(',', $temp) . '" WHERE count_type="' . $this->count_type . '" AND count_id="' . $this->count_id . '"';
@@ -290,7 +290,7 @@ class wppvp{
 			}
 		} else {
 			switch( $addin ) {
-			  case 'tv':
+				case 'tv':
 					$sql = 'INSERT INTO ' . $wpdb->prefix . 'postviewsplus (count_type, count_id, tv) VALUES ("' . $this->count_type . '", "' . $this->count_id . '", "' . $post->ID . '")';
 					break;
 				case 'gt1':
@@ -304,8 +304,8 @@ class wppvp{
 		$wpdb->query($sql);
 	}
 	function update() {
-	  $this->botAgent['now'] = s2a(get_option('PV+_botagent'));
-   	$this->pv_option['now'] = get_option('PV+_option');
+		$this->botAgent['now'] = s2a(get_option('PV+_botagent'));
+ 		$this->pv_option['now'] = get_option('PV+_option');
 		$this->views['now'] = get_option('PV+_views');
 	}
 }
@@ -354,8 +354,8 @@ add_action('loop_start', 'process_postviews');
 function process_postviews() {
 	global $post, $pv_data;
 	if( !wp_is_post_revision($post) ) {
-	  $pv_data->add_count_data();
-	  echo("\n" . '<!-- Start Of Script Generated By WP-PostViews Plus -->' . "\n");
+		$pv_data->add_count_data();
+		echo("\n" . '<!-- Start Of Script Generated By WP-PostViews Plus -->' . "\n");
 		wp_print_scripts('jquery');
 		echo('<script type="text/javascript">' . "\n");
 		echo('/* <![CDATA[ */' . "\n");
@@ -363,13 +363,13 @@ function process_postviews() {
 			if( defined('WP_CACHE') && WP_CACHE ) {
 				echo("jQuery.ajax({type:'GET',url:'" . plugins_url('wp-postviews-plus/postviews_plus.php') . "',data:'todowppvp=add&type=" . $pv_data->count_type . "&id=" . $pv_data->count_id . "',cache:false,dataType:'script'});" . "\n");
 				if( $pv_data->count_bot=='bot' ) {
-				  $pv_data->increment_views();
+					$pv_data->increment_views();
 				}
 			} else {
-			  $pv_data->increment_views();
+				$pv_data->increment_views();
 			}
 		} else {
-		  echo("jQuery.ajax({type:'GET',url:'" . plugins_url('wp-postviews-plus/postviews_plus.php') . "',data:'todowppvp=&type=" . $pv_data->count_type . "&id=" . $pv_data->count_id . "',cache:false,dataType:'script'});" . "\n");
+			echo("jQuery.ajax({type:'GET',url:'" . plugins_url('wp-postviews-plus/postviews_plus.php') . "',data:'todowppvp=&type=" . $pv_data->count_type . "&id=" . $pv_data->count_id . "',cache:false,dataType:'script'});" . "\n");
 		}
 		echo('/* ]]> */' . "\n");
 		echo('</script>' . "\n");
@@ -462,13 +462,13 @@ function get_most_viewed($mode='', $limit=10, $chars=0, $display=true, $with_bot
 
 ### Function: make sql for Category ID
 function make_sql_category_id($category_id) {
-   global $wpdb, $post;
+ global $wpdb, $post;
 	if( is_int($category_id) && $category_id>0 ) {
-	   $ttid = $wpdb->get_col('SELECT term_taxonomy_id FROM ' . $wpdb->term_taxonomy . ' WHERE term_id = ' . $category_id);
+		$ttid = $wpdb->get_col('SELECT term_taxonomy_id FROM ' . $wpdb->term_taxonomy . ' WHERE term_id = ' . $category_id);
 		$make_sql = 'tr.term_taxonomy_id IN (' . join(', ', $ttid) . ')';
 	} elseif( is_array($category_id) ) {
-	   $term_id = 'term_id IN (' . implode(', ', $category_id) . ')';
-	   $ttid = $wpdb->get_col('SELECT term_taxonomy_id FROM ' . $wpdb->term_taxonomy . ' WHERE ' . $term_id);
+		$term_id = 'term_id IN (' . implode(', ', $category_id) . ')';
+		$ttid = $wpdb->get_col('SELECT term_taxonomy_id FROM ' . $wpdb->term_taxonomy . ' WHERE ' . $term_id);
 		$make_sql .= 'tr.term_taxonomy_id IN (' . join(', ', $ttid) . ')';
 	} else {
 		$make_sql .= 'tr.term_taxonomy_id IN (';
@@ -620,28 +620,29 @@ register_activation_hook(__FILE__, 'postviews_plus_add');
 function postviews_plus_add() {
 	global $wpdb, $pv_data;
 	if( !isset($pv_data) ) {
-	  $pv_data = new wppvp;
+		$pv_data = new wppvp;
 	}
 	add_option('PV+_botagent', a2s($pv_data->botAgent['def']));
-	//update_option('PV+_botagent', a2s(array_merge(array_diff($pv_data->botAgent['def'], $pv_data->botAgent['now']), $pv_data->botAgent['now'])));
 	add_option('PV+_option', $pv_data->pv_option['def']);
-	//update_option('PV+_option', array_merge($pv_data->pv_option['def'] ,$pv_data->pv_option['now']));
 	add_option('PV+_useragent', '');
 	add_option('PV+_views', $pv_data->views['def']);
+	add_option('PV+_DBversion', '1.1.23');
 	$sql = 'SHOW TABLES FROM ' . DB_NAME . ' LIKE "' . $wpdb->prefix . 'postviewsplus"';
 	if( $wpdb->get_var($sql)==null ) {
-	  $wpdb->get_var('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviewsplus (
-			`count_type` VARCHAR(10) NOT NULL,
-			`count_id` VARCHAR(10) NOT NULL,
+		$wpdb->get_var('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviewsplus (
+			`count_type` VARCHAR(255) NOT NULL,
+			`count_id` VARCHAR(255) NOT NULL,
 			`tv` VARCHAR(255) NOT NULL DEFAULT "",
 			`gt` VARCHAR(255) NOT NULL DEFAULT "",
 			`look_ip` TEXT NOT NULL,
 			`look_ip_time` INT UNSIGNED NOT NULL DEFAULT "0",
 			PRIMARY KEY (`count_type`, `count_id`))');
 	} else {
-	  $wpdb->get_var('ALTER TABLE ' . $wpdb->prefix . 'postviewsplus
+		$wpdb->get_var('ALTER TABLE ' . $wpdb->prefix . 'postviewsplus
 			ADD `look_ip` TEXT NOT NULL,
 			ADD `look_ip_time` INT UNSIGNED NOT NULL DEFAULT "0"');
 	}
+	$wpdb->get_var('ALTER TABLE ' . $wpdb->prefix . 'postviewsplus CHANGE `count_type` `count_type` VARCHAR(255) NOT NULL');
+	$wpdb->get_var('ALTER TABLE ' . $wpdb->prefix . 'postviewsplus CHANGE `count_id` `count_id` VARCHAR(255) NOT NULL');
 }
 ?>

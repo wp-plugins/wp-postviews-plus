@@ -17,7 +17,7 @@ if( isset($_POST['update_pvp']) ) {
 			$text .= '<font color="green">'.__('Reset Options Success' ,'postviews_plus').'</font>';
 		}
 	} elseif( isset($_POST['reset_pv']) ) {
-	  update_option('PV+_views', $pv_data->views['def']);
+		update_option('PV+_views', $pv_data->views['def']);
  		$wpdb->query('UPDATE ' . $wpdb->prefix . 'postviewsplus SET look_ip="", look_ip_time="' . (time()+7200) . '" WHERE 1');
 		if( $wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_key = 'views' OR meta_key = 'bot_views'") ) {
 			$text .= '<font color="green">'.__('Reset Post View Timws Success' ,'postviews_plus').'</font>';
@@ -36,7 +36,7 @@ if( isset($_POST['update_pvp']) ) {
 				$message = $botAgent;
 				$message = str_replace(ARRAY_CAT, "\n", $message);
 				$message .= "\n".'By '.$user_identity.' From '.get_bloginfo('admin_email').' AT '.get_bloginfo('wpurl');
-				if(FALSE != wp_mail('fantasyworldidvtw@gmail.com', $user_identity.' Postviews+ BOT User_agent Report', $message)) {
+				if( FALSE != wp_mail('fantasyworldidvtw@gmail.com', $user_identity.' Postviews+ BOT User_agent Report', $message) ) {
 					$text .= '<font color="green">'.__('Report BOT User_agent Success' ,'postviews_plus').'</font>';
 				} else {
 					$text .= '<font color="red">'.__('Report BOT User_agent Fail' ,'postviews_plus').'</font>';
@@ -67,7 +67,7 @@ echo '<input name="mostviewsnobot" type="text" value="'.$pv_data->pv_option['now
 echo '<p class="submit"><input type="submit" name="update_op" class="button" value="'.__('Update Options' ,'postviews_plus').'" /><input type="submit" name="reset_op" class="button" value="'.__('Reset Option' ,'postviews_plus').'" /><input type="submit" name="reset_pv" class="button" value="'.__('Reset Post Views' ,'postviews_plus').'" /></p>';
 echo '</td></tr>';
 if( $pv_data->pv_option['now']['getuseragent']==1 ) {
-  $Useragent = s2a(get_option('PV+_useragent'));
+	$Useragent = s2a(get_option('PV+_useragent'));
 	echo '<tr valign="top"><th scope="row">'.__('User User_agent' ,'postviews_plus').'</th>';
 	echo '<td>'.implode("<br />", $Useragent);
 	echo '<p class="submit"><input type="submit" name="clear_user_ua" class="button" value="'.__('Clear User User_agent record' ,'postviews_plus').'" /></p>';
