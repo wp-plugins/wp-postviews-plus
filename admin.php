@@ -11,9 +11,9 @@ add_filter('plugin_action_links', 'postviews_plus_links', 10, 2);
 
 function postviews_plus_set(){
 
+global $views_options;
 $views_settings = array('PVP_options', 'widget_views-plus');
 $views_postmetas = array('views', 'bot_views');
-$views_options = get_option('PVP_options');
 
 if( !empty($_POST['Update']) ) {
 	$views_options = array();
@@ -25,6 +25,8 @@ if( !empty($_POST['Update']) ) {
 	$views_options['display_search'] = intval($_POST['views_display_search']);
 	$views_options['display_other'] = intval($_POST['views_display_other']);
 	$views_options['template'] = trim($_POST['views_template_template']);
+	$views_options['user_template'] = trim($_POST['views_template_user_template']);
+	$views_options['bot_template'] = trim($_POST['views_template_bot_template']);
 	$views_options['most_viewed_template'] = trim($_POST['views_template_most_viewed']);
 	$views_options['botagent'] = explode("\n",trim($_POST['views_botagent']));
 	if( update_option('PVP_options', $views_options) ) {
@@ -87,10 +89,10 @@ if( !empty($_POST['do']) ) {
 	<p>&nbsp;</p>
 	<table class="widefat">
 		<thead><tr>
-			<th colspan="2"><?php _e('Basic Options', 'wp-postviews-plus'); ?></th>
+			<th colspan="3"><?php _e('Basic Options', 'wp-postviews-plus'); ?></th>
 		</tr></thead>
 		<tr>
-			<td valign="top" width="25%"><strong><?php _e('Count Views From:', 'wp-postviews-plus'); ?></strong></td>
+			<td valign="top" width="30%" colspan="2"><strong><?php _e('Count Views From:', 'wp-postviews-plus'); ?></strong></td>
 			<td valign="top">
 				<select name="views_count" size="1">
 					<option value="0"<?php selected('0', $views_options['count']); ?>><?php _e('Everyone', 'wp-postviews-plus'); ?></option>
@@ -100,25 +102,40 @@ if( !empty($_POST['do']) ) {
 			</td>
 		</tr>
 		<tr>
-			<td valign="top">
+			<td valign="top" rowspan="3">
 				<strong><?php _e('Views Template:', 'wp-postviews-plus'); ?></strong>
 			</td>
+			<td>the views:</td>
 			<td valign="top">
 				<input type="text" id="views_template_template" name="views_template_template" size="70" value="<?php echo htmlspecialchars(stripslashes($views_options['template'])); ?>" /><br />
-				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?><br />	- %VIEW_COUNT%
+				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT%
 			</td>
 		</tr>
 		<tr>
+			<td>the user views:</td>
 			<td valign="top">
+				<input type="text" id="views_template_user_template" name="views_template_user_template" size="70" value="<?php echo htmlspecialchars(stripslashes($views_options['user_template'])); ?>" /><br />
+				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT%
+			</td>
+		</tr>
+		<tr>
+			<td>the bot views:</td>
+			<td valign="top">
+				<input type="text" id="views_template_bot_template" name="views_template_bot_template" size="70" value="<?php echo htmlspecialchars(stripslashes($views_options['bot_template'])); ?>" /><br />
+				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT%
+			</td>
+		</tr>
+		<tr>
+			<td valign="top"colspan="2">
 				<strong><?php _e('Most Viewed Template:', 'wp-postviews-plus'); ?></strong>
 			</td>
 			<td valign="top">
-				<textarea cols="65" rows="5"  id="views_template_most_viewed" name="views_template_most_viewed"><?php echo htmlspecialchars(stripslashes($views_options['most_viewed_template'])); ?></textarea><br />
+				<textarea cols="65" rows="4"  id="views_template_most_viewed" name="views_template_most_viewed"><?php echo htmlspecialchars(stripslashes($views_options['most_viewed_template'])); ?></textarea><br />
 				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?><br /> - %VIEW_COUNT% - %POST_TITLE% - %POST_EXCERPT% - %POST_CONTENT% - %POST_DATE% - %POST_URL%
 			</td>
 		</tr>
 		<tr>
-			<td valign="top">
+			<td valign="top"colspan="2">
 				<strong><?php _e('BOT User_agent:', 'wp-postviews-plus'); ?></strong>
 			</td>
 			<td valign="top">
@@ -133,7 +150,7 @@ if( !empty($_POST['do']) ) {
 			<th colspan="3"><?php _e('Display Options', 'wp-postviews-plus'); ?></th>
 		</tr></thead>		
 		<tr>
-			<td valign="top" width="25%"><strong><?php _e('Home Page:', 'wp-postviews-plus'); ?></strong></td>
+			<td valign="top" width="30%"><strong><?php _e('Home Page:', 'wp-postviews-plus'); ?></strong></td>
 			<td>
 				<select name="views_display_home" size="1">
 					<option value="0"<?php selected('0', $views_options['display_home']); ?>><?php _e('Display to everyone', 'wp-postviews-plus'); ?></option>

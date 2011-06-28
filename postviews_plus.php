@@ -2,10 +2,10 @@
 /*
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
-Description: Enables you to display how many times a post/page had been viewed by user or bot.
-Version: 1.2.1
+Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
+Version: 1.2.2
 Author: Richer Yang
-Author URI: http://wwpteach.com/
+Author URI: http://fantasyworld.idv.tw/
 */
 
 /**************************************************
@@ -27,6 +27,15 @@ if( !function_exists('add_action') ) {
 }
 
 define('PVP_TABLE', $wpdb->prefix . 'postviews_plus');
+$views_options = get_option('PVP_options');
+if( !isset($views_options['user_template']) ) {
+	$views_options['user_template'] = '%VIEW_COUNT% ' . __('user views', 'wp-postviews-plus');
+}
+if( !isset($views_options['bot_template']) ) {
+	$views_options['bot_template'] = '%VIEW_COUNT% ' . __('bot views', 'wp-postviews-plus');
+}
+
+include dirname( __FILE__ ) . '/widget.php';
 
 if( is_admin() ) {
 	$currentLocale = get_locale();
@@ -38,18 +47,17 @@ if( is_admin() ) {
 			load_textdomain('wp-postviews-plus', $moFile);
 		}
 	}
-	require_once dirname( __FILE__ ) . '/admin.php';
+	include dirname( __FILE__ ) . '/admin.php';
 }
 
 function process_postviews() {
-	global $user_ID, $post;
+	global $user_ID, $post, $views_options;
 	if( is_int($post) ) {
 		$post = get_post($post);
 	}
 	if( !wp_is_post_revision($post) ) {
 		if( is_single() || is_page() ) {
 			$post_id = intval($post->ID);
-			$views_options = get_option('PVP_options');
 			$should_count = false;
 			switch( intval($views_options['count']) ) {
 				case 0:
@@ -87,33 +95,31 @@ function add_scripts() {
 }
 add_action('wp_head', 'add_scripts', 1);
 
-function should_views_be_displayed($views_options = null) {
-	if( $views_options == null ) {
-		$views_options = get_option('PVP_options');
-	}
+function should_views_be_displayed() {
+	global $views_options;
 	$display_option = 0;
 	if( is_home() ) {
-		if( array_key_exists('display_home', $views_options) ) {
+		if( isset($views_options['display_home']) ) {
 			$display_option = $views_options['display_home'];
 		}
 	} elseif( is_single() ) {
-		if( array_key_exists('display_single', $views_options) ) {
+		if( isset($views_options['display_single']) ) {
 			$display_option = $views_options['display_single'];
 		}
 	} elseif( is_page() ) {
-		if( array_key_exists('display_page', $views_options) ) {
+		if( isset($views_options['display_page']) ) {
 			$display_option = $views_options['display_page'];
 		}
 	} elseif( is_archive() ) {
-		if( array_key_exists('display_archive', $views_options) ) {
+		if( isset($views_options['display_archive']) ) {
 			$display_option = $views_options['display_archive'];
 		}
 	} elseif( is_search() ) {
-		if( array_key_exists('display_search', $views_options) ) {
+		if( isset($views_options['display_search']) ) {
 			$display_option = $views_options['display_search'];
 		}
 	} else {
-		if( array_key_exists('display_other', $views_options)) {
+		if( isset($views_options['display_other']) ) {
 			$display_option = $views_options['display_other'];
 		}
 	}
@@ -170,9 +176,8 @@ function add_cache_stats($addin) {
 }
 
 function the_views($text_views = null, $display = true, $always = false) {
-	global $post;
+	global $post, $views_options;
 	$post_views = intval(get_post_meta($post->ID, 'views', true)) + intval(get_post_meta($post->ID, 'bot_views', true));
-	$views_options = get_option('PVP_options');
 	if( $always || should_views_be_displayed($views_options) ) {
 		if( $display ) {
 			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tv_' . $post->ID . '">%VIEW_COUNT%</span>', $views_options['template']);
@@ -186,12 +191,11 @@ function the_views($text_views = null, $display = true, $always = false) {
 }
 
 function the_user_views($text_views = null, $display = true, $always = false) {
-	global $post;
+	global $post, $views_options;
 	$post_views = intval(get_post_meta($post->ID, 'views', true));
-	$views_options = get_option('PVP_options');
 	if( $always || should_views_be_displayed($views_options) ) {
 		if( $display ) {
-			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tuv_' . $post->ID . '">%VIEW_COUNT%</span>', $views_options['template']);
+			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tuv_' . $post->ID . '">%VIEW_COUNT%</span>', $views_options['user_template']);
 			echo(str_replace('%VIEW_COUNT%', number_format_i18n($post_views), $template));
 			add_cache_stats('tv');
 		} else {
@@ -202,12 +206,11 @@ function the_user_views($text_views = null, $display = true, $always = false) {
 }
 
 function the_bot_views($text_views = null, $display = true, $always = false) {
-	global $post;
+	global $post, $views_options;
 	$post_views = intval(get_post_meta($post->ID, 'bot_views', true));
-	$views_options = get_option('PVP_options');
 	if( $always || should_views_be_displayed($views_options) ) {
 		if( $display ) {
-			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tbv_' . $post->ID . '">%VIEW_COUNT%</span>', $views_options['template']);
+			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tbv_' . $post->ID . '">%VIEW_COUNT%</span>', $views_options['bot_template']);
 			echo(str_replace('%VIEW_COUNT%', number_format_i18n($post_views), $template));
 			add_cache_stats('tv');
 		} else {
@@ -266,8 +269,7 @@ function my_str_replace($template, $post, $chars) {
 }
 
 function get_timespan_most_viewed($mode = '', $limit = 10, $chars = 0, $display = true, $with_bot = true, $days = 7) {
-	global $wpdb;
-	$views_options = get_option('PVP_options');
+	global $wpdb, $views_options;
 	$output = '';
 	if( $mode == 'post' ) {
 		$where = 'p.post_type = "post"';
@@ -305,8 +307,7 @@ function get_most_viewed($mode = '', $limit = 10, $chars = 0, $display = true, $
 }
 
 function get_timespan_most_viewed_category($category_id = 1, $mode = null, $limit = 10, $chars = 0, $display = true, $with_bot = true, $days = 7) {
-	global $wpdb;
-	$views_options = get_option('PVP_options');
+	global $wpdb, $views_options;
 	$output = '';
 	if( is_array($category_id) ) {
 		$where = 'tt.term_id IN (' . join(',', $category_id) . ')';
@@ -342,8 +343,7 @@ function get_most_viewed_category($category_id = 1, $mode = null, $limit = 10, $
 }
 
 function get_timespan_most_viewed_tag($tag_id = 1, $mode = null, $limit = 10, $chars = 0, $display = true, $with_bot = true, $days = 7) {
-	global $wpdb;
-	$views_options = get_option('PVP_options');
+	global $wpdb, $views_options;
 	$output = '';
 	if( is_array($tag_id) ) {
 		$where = 'tt.term_id IN (' . join(',', $tag_id) . ')';
@@ -379,8 +379,7 @@ function get_most_viewed_tag($tag_id = 1, $mode = null, $limit = 10, $chars = 0,
 }
 
 function get_totalviews($display = true, $with_bot = true) {
-	global $wpdb, $pv_data;
-	$views_options = get_option('PVP_options');
+	global $wpdb, $pv_data, $views_options;
 	if( $with_bot ) {
 		$total_views = $wpdb->get_var('SELECT SUM(IFNULL(CAST(meta_value AS UNSIGNED), 0)) FROM ' . $wpdb->postmeta . ' WHERE meta_key = "views" OR meta_key = "bot_views"');
 		$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_gt_1">%VIEW_COUNT%</span>', $views_options['template']);
@@ -443,7 +442,7 @@ function change_views() {
 
 increment_views();
 function increment_views($doit = null, $id = 0) {
-	global $wpdb;
+	global $wpdb, $views_options;
 	if( $doit == 'in_process_postviews' ) {
 		$post_id = $id;
 	} elseif( isset($_GET['postviews_id']) ) {
@@ -452,11 +451,11 @@ function increment_views($doit = null, $id = 0) {
 		$post_id = 0;
 	}
 	if( $post_id > 0 && ((defined('WP_CACHE') && WP_CACHE) || $doit == 'in_process_postviews') ) {
-		$views_options = get_option('PVP_options');
 		$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
 		$bot = false;
+		echo($useragent);
 		if( preg_match('/((mozilla\/)|(opera\/))/', $useragent) ) {
-			if( count($botagent)>0 ) {
+			if(  is_array($views_options['botagent']) ) {
 				$regex = '/(' . str_replace('/', '\/', implode($views_options['botagent'], ')|(')) . ')/si';
 				$bot = preg_match($regex, $useragent);
 			}
@@ -480,121 +479,6 @@ function increment_views($doit = null, $id = 0) {
 	}
 }
 
-class WP_Widget_PostViews_Plus extends WP_Widget {
-	function WP_Widget_PostViews_Plus() {
-		$widget_ops = array('description' => __('WP-PostViews plus views statistics', 'wp-postviews-plus'));
-		$this->WP_Widget('views-plus', __('Views Stats', 'wp-postviews-plus'), $widget_ops);
-	}
-	function widget($args, $instance) {
-		extract($args);
-		$title = apply_filters('widget_title', esc_attr($instance['title']));
-		$type = esc_attr($instance['type']);
-		$mode = esc_attr($instance['mode']);
-		$withbot = esc_attr($instance['withbot']);
-		$limit = intval($instance['limit']);
-		$chars = intval($instance['chars']);
-		$cat_ids = explode(',', esc_attr($instance['cat_ids']));
-		$tag_ids = explode(',', esc_attr($instance['tag_ids']));
-		echo $before_widget.$before_title.$title.$after_title;
-		echo '<ul>'."\n";
-		switch($type) {
-			case 'most_viewed':
-				get_most_viewed($mode, $limit, $chars, true, $withbot);
-				break;
-			case 'most_viewed_category':
-				get_most_viewed_category($cat_ids, $mode, $limit, $chars, true, $withbot);
-				break;
-			case 'most_viewed_tag':
-				get_most_viewed_tag($tag_ids, $mode, $limit, $chars, true, $withbot);
-				break;
-		}
-		echo '</ul>'."\n";
-		echo $after_widget;
-	}
-	function update($new_instance, $old_instance) {
-		if( !isset($new_instance['submit']) ) {
-			return false;
-		}
-		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['type'] = strip_tags($new_instance['type']);
-		$instance['mode'] = strip_tags($new_instance['mode']);
-		$instance['withbot'] = strip_tags($new_instance['withbot']);
-		$instance['limit'] = intval($new_instance['limit']);
-		$instance['chars'] = intval($new_instance['chars']);
-		$instance['cat_ids'] = strip_tags($new_instance['cat_ids']);
-		$instance['tag_ids'] = strip_tags($new_instance['tag_ids']);
-		return $instance;
-	}
-	function form($instance) {
-		global $wpdb;
-		$instance = wp_parse_args((array) $instance, array('title' => __('Views', 'wp-postviews-plus'), 'type' => 'most_viewed', 'mode' => 'both', 'limit' => 10, 'chars' => 200, 'cat_ids' => '0', 'tag_ids' => '0', 'withbot' => '1'));
-		$title = esc_attr($instance['title']);
-		$type = esc_attr($instance['type']);
-		$mode = esc_attr($instance['mode']);
-		$withbot = esc_attr($instance['withbot']);
-		$limit = intval($instance['limit']);
-		$chars = intval($instance['chars']);
-		$cat_ids = esc_attr($instance['cat_ids']);
-		$tag_ids = esc_attr($instance['tag_ids']);
-?>
-		<p>
-			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-postviews-plus'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('type'); ?>"><?php _e('Statistics Type:', 'wp-postviews-plus'); ?>
-				<select name="<?php echo $this->get_field_name('type'); ?>" id="<?php echo $this->get_field_id('type'); ?>" class="widefat">
-					<option value="most_viewed"<?php selected('most_viewed', $type); ?>><?php _e('Most Viewed', 'wp-postviews-plus'); ?></option>
-					<option value="most_viewed_category"<?php selected('most_viewed_category', $type); ?>><?php _e('Most Viewed By Category', 'wp-postviews-plus'); ?></option>
-					<option value="most_viewed_tag"<?php selected('most_viewed_tag', $type); ?>><?php _e('Most Viewed By Tag', 'wp-postviews-plus'); ?></option>
-				</select>
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('mode'); ?>"><?php _e('Include Views From:', 'wp-postviews-plus'); ?>
-				<select name="<?php echo $this->get_field_name('mode'); ?>" id="<?php echo $this->get_field_id('mode'); ?>" class="widefat">
-					<option value="both"<?php selected('both', $mode); ?>><?php _e('Posts &amp; Pages', 'wp-postviews-plus'); ?></option>
-					<option value="post"<?php selected('post', $mode); ?>><?php _e('Posts Only', 'wp-postviews-plus'); ?></option>
-					<option value="page"<?php selected('page', $mode); ?>><?php _e('Pages Only', 'wp-postviews-plus'); ?></option>
-				</select>
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('No. Of Records To Show:', 'wp-postviews-plus'); ?> <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>" /></label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('chars'); ?>"><?php _e('Maximum Post Title Length (Characters):', 'wp-postviews-plus'); ?> <input class="widefat" id="<?php echo $this->get_field_id('chars'); ?>" name="<?php echo $this->get_field_name('chars'); ?>" type="text" value="<?php echo $chars; ?>" /></label><br />
-			<small><?php _e('<strong>0</strong> to disable.', 'wp-postviews-plus'); ?></small>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('withbot'); ?>"><?php _e('With BOT Views:', 'wp-postviews-plus'); ?>
-				<select name="<?php echo $this->get_field_name('withbot'); ?>" id="<?php echo $this->get_field_id('withbot'); ?>" class="widefat">
-					<option value="1"<?php selected('1', $withbot); ?>><?php _e('With BOT', 'wp-postviews-plus'); ?></option>
-					<option value="0"<?php selected('0', $withbot); ?>><?php _e('Without BOT', 'wp-postviews-plus'); ?></option>
-				</select>
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('cat_ids'); ?>"><?php _e('Category IDs:', 'wp-postviews-plus'); ?> <span style="color: red;">*</span> <input class="widefat" id="<?php echo $this->get_field_id('cat_ids'); ?>" name="<?php echo $this->get_field_name('cat_ids'); ?>" type="text" value="<?php echo $cat_ids; ?>" /></label><br />
-			<small><?php _e('Seperate mutiple categories with commas.', 'wp-postviews-plus'); ?></small>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('tag_ids'); ?>"><?php _e('Tag IDs:', 'wp-postviews-plus'); ?> <span style="color: red;">*</span> <input class="widefat" id="<?php echo $this->get_field_id('tag_ids'); ?>" name="<?php echo $this->get_field_name('tag_ids'); ?>" type="text" value="<?php echo $tag_ids; ?>" /></label><br />
-			<small><?php _e('Seperate mutiple categories with commas.', 'wp-postviews-plus'); ?></small>
-		</p>
-		<p style="color: red;">
-			<small><?php _e('* If you are not using any category or tag statistics, you can ignore it.', 'wp-postviews-plus'); ?></small>
-		</p>
-		<input type="hidden" id="<?php echo $this->get_field_id('submit'); ?>" name="<?php echo $this->get_field_name('submit'); ?>" value="1" />
-<?php
-	}
-}
-function pp_widget_views_init() {
-	register_widget('WP_Widget_PostViews_Plus');
-}
-add_action('widgets_init', 'pp_widget_views_init');
-
-add_action('activate_wp-postviews-plus/postviews_plus.php', 'pp_views_init');
 function pp_views_init() {
 	global $wpdb;
 	$views_options = array();
@@ -606,6 +490,8 @@ function pp_views_init() {
 	$views_options['display_search'] = 0;
 	$views_options['display_other'] = 0;
 	$views_options['template'] = '%VIEW_COUNT% ' . __('views', 'wp-postviews-plus');
+	$views_options['user_template'] = '%VIEW_COUNT% ' . __('user views', 'wp-postviews-plus');
+	$views_options['bot_template'] = '%VIEW_COUNT% ' . __('bot views', 'wp-postviews-plus');
 	$views_options['botagent'] = array('bot', 'spider', 'slurp');
 	$views_options['most_viewed_template'] = '<li><a href="%POST_URL%"  title="%POST_TITLE%">%POST_TITLE%</a> - %VIEW_COUNT% ' . __('views', 'wp-postviews-plus') . '</li>';
 	add_option('PVP_options', $views_options, 'Post Views Plus Options');
@@ -621,4 +507,5 @@ function pp_views_init() {
 	delete_option('PV+_views');
 	delete_option('PV+_DBversion');
 }
+add_action('activate_wp-postviews-plus/postviews_plus.php', 'pp_views_init');
 ?>
