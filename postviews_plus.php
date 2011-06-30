@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.2.2
+Version: 1.2.3
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -453,7 +453,6 @@ function increment_views($doit = null, $id = 0) {
 	if( $post_id > 0 && ((defined('WP_CACHE') && WP_CACHE) || $doit == 'in_process_postviews') ) {
 		$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
 		$bot = false;
-		echo($useragent);
 		if( preg_match('/((mozilla\/)|(opera\/))/', $useragent) ) {
 			if(  is_array($views_options['botagent']) ) {
 				$regex = '/(' . str_replace('/', '\/', implode($views_options['botagent'], ')|(')) . ')/si';
