@@ -2,8 +2,8 @@
 Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
 Requires at least: 3.0
-Tested up to: 3.1.3
-Stable tag: 1.2.3
+Tested up to: 3.1.4
+Stable tag: 1.2.4
 
 Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
