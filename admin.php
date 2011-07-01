@@ -28,7 +28,14 @@ if( !empty($_POST['Update']) ) {
 	$views_options['user_template'] = trim($_POST['views_template_user_template']);
 	$views_options['bot_template'] = trim($_POST['views_template_bot_template']);
 	$views_options['most_viewed_template'] = trim($_POST['views_template_most_viewed']);
-	$views_options['botagent'] = explode("\n",trim($_POST['views_botagent']));
+	$botagent = explode("\r\n", trim($_POST['views_botagent']));
+	if( !is_array($botagent) ) {
+		$botagent = explode("\n", trim($_POST['views_botagent']));
+	}
+	if( !is_array($botagent) ) {
+		$botagent = array('bot', 'spider', 'slurp');
+	}
+	$views_options['botagent'] = $botagent;
 	if( update_option('PVP_options', $views_options) ) {
 		$text = '<font color="green">' . __('Updated Options Success', 'wp-postviews-plus') . '</font>';
 	}

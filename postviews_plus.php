@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.2.4
+Version: 1.2.5
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -33,6 +33,10 @@ if( !isset($views_options['user_template']) ) {
 }
 if( !isset($views_options['bot_template']) ) {
 	$views_options['bot_template'] = '%VIEW_COUNT% ' . __('bot views', 'wp-postviews-plus');
+}
+$botagent = implode("\n", $views_options['botagent']);
+if( strpos($botagent, "\r\n") ) {
+	$views_options['botagent'] = explode("\r\n", trim($_POST['views_botagent']));
 }
 
 include dirname( __FILE__ ) . '/widget.php';
@@ -453,10 +457,8 @@ function increment_views($doit = null, $id = 0) {
 	if( $post_id > 0 && ((defined('WP_CACHE') && WP_CACHE) || $doit == 'in_process_postviews') ) {
 		$useragent = strtolower(trim($_SERVER['HTTP_USER_AGENT']));
 		$bot = false;
-		if(  is_array($views_options['botagent']) ) {
-			$find = array('.', '^', '$', '*', '+', '?', '-', '{', '}', '[', ']', '(', ')', '|', '\\');
-			$replace = array('\.', '\^', '\$', '\*', '\+', '\?', '\-', '\{', '\}', '\[', '\]', '\(', '\)', '\|', '\\\\');
-			$regex = '/(' . str_replace($find, $replace, implode($views_options['botagent'], ')|(')) . ')/si';
+		if( is_array($views_options['botagent']) ) {
+			$regex = '/(' . str_replace('@@@@@@', ')|(', preg_quote(implode($views_options['botagent'], '@@@@@@'), '/')) . ')/si';
 			$bot = preg_match($regex, $useragent);
 		}
 		if( $bot ) {
