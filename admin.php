@@ -41,6 +41,26 @@ if( !empty($_POST['Update']) ) {
 	}
 }
 
+if( !empty($_POST['Default']) ) {
+	delete_option('PVP_options');
+	$views_options = array();
+	$views_options['count'] = 1;
+	$views_options['display_home'] = 0;
+	$views_options['display_single'] = 0;
+	$views_options['display_page'] = 0;
+	$views_options['display_archive'] = 0;
+	$views_options['display_search'] = 0;
+	$views_options['display_other'] = 0;
+	$views_options['template'] = '%VIEW_COUNT% ' . __('views', 'wp-postviews-plus');
+	$views_options['user_template'] = '%VIEW_COUNT% ' . __('user views', 'wp-postviews-plus');
+	$views_options['bot_template'] = '%VIEW_COUNT% ' . __('bot views', 'wp-postviews-plus');
+	$views_options['botagent'] = array('bot', 'spider', 'slurp');
+	$views_options['most_viewed_template'] = '<li><a href="%POST_URL%"  title="%POST_TITLE%">%POST_TITLE%</a> - %VIEW_COUNT% ' . __('views', 'wp-postviews-plus') . '</li>';
+	if( update_option('PVP_options', $views_options) ) {
+		$text = '<font color="green">' . __('Reset Optionsto Default Success', 'wp-postviews-plus') . '</font>';
+	}
+}
+
 if( !empty($_POST['do']) ) {
 	switch($_POST['do']) {		
 		case __('UNINSTALL WP-PostViews Plus', 'wp-postviews-plus') :
@@ -218,7 +238,10 @@ if( !empty($_POST['do']) ) {
 			</td>
 		</tr>
 	</table>
-	<p class="submit"><input type="submit" name="Update" class="button-primary" value="<?php _e('Save Changes', 'wp-postviews-plus'); ?>" /></p>
+	<p class="submit">
+		<input type="submit" name="Update" class="button-primary" value="<?php _e('Save Changes', 'wp-postviews-plus'); ?>" />
+		<input type="submit" name="Default" class="button-primary" value="<?php _e('Reset to Default', 'wp-postviews-plus'); ?>" />
+	</p>
 </form></div>
 <div class="wrap"><form method="post" action="">
 	<h3><?php _e('Uninstall WP-PostViews Plus', 'wp-postviews-plus'); ?></h3>
@@ -260,7 +283,7 @@ if( !empty($_POST['do']) ) {
 
 function postviews_plus_admin()
 {
-	add_submenu_page('options-general.php', 'WP-PostViews Plus', 'PostViews+', 'manage_options', 'postviews_plus', 'postviews_plus_set');
+	add_submenu_page('options-general.php', 'WP-PostViews Plus', __('PostViews+', 'wp-postviews-plus'), 'manage_options', 'postviews_plus', 'postviews_plus_set');
 }
 add_action('admin_menu', 'postviews_plus_admin');
 ?>

@@ -77,6 +77,7 @@ class WP_Widget_PostViews_Plus extends WP_Widget {
 					<option value="page"<?php selected('page', $mode); ?>><?php _e('Pages Only', 'wp-postviews-plus'); ?></option>
 				</select>
 			</label>
+			<small><?php _e('Only work with ', 'wp-postviews-plus'); _e('Most Viewed', 'wp-postviews-plus'); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('No. Of Records To Show:', 'wp-postviews-plus'); ?> <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>" /></label>
