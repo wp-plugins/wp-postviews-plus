@@ -1,9 +1,9 @@
 === WP-PostViews Plus ===
 Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
-Requires at least: 3.2.1
-Tested up to: 3.2.6
-Stable tag: 1.2.6
+Requires at least: 3.0.0
+Tested up to: 3.2.1
+Stable tag: 1.2.7
 
 Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
@@ -14,7 +14,15 @@ To differentiate between USER and BOT is by HTTP_agent, and it can set at admin
 == Installation ==
 1. Upload 'postviews_plus' directory to the '/wp-content/plugins/' directory.
 2. Activate the plugin 'WP-PostViews Plus' through the 'Plugins' menu in WordPress.
-3. Place the show views function in your templates. [function reference](http://fantasyworld.idv.tw/programs/wp_postviews_plus "function reference")
+3. Place the show views function in your templates. [function reference](http://wwpteach.com/wp-postviews-plus/2 "function reference")
+
+== Screenshots ==
+
+1. Using page
+2. setting page
 
 == Frequently Asked Questions ==
-Please visit the [plugin page](http://fantasyworld.idv.tw/programs/wp_postviews_plus " ") with any questions.
+Please visit the [plugin page](http://wwpteach.com/wp-postviews-plus " ") with any questions.
+
+== Changelog ==
+Please move to [plugin change log](http://wwpteach.com/wp-postviews-plus/history " ")

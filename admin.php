@@ -11,13 +11,15 @@ add_filter('plugin_action_links', 'postviews_plus_links', 10, 2);
 
 function postviews_plus_set(){
 
-global $views_options;
+global $views_options, $wpdb;
 $views_settings = array('PVP_options', 'widget_views-plus');
 $views_postmetas = array('views', 'bot_views');
 
 if( !empty($_POST['Update']) ) {
 	$views_options = array();
 	$views_options['count'] = intval($_POST['views_count']);
+	$views_options['check_reflash'] = intval($_POST['views_check_reflash']);
+	$views_options['timeout'] = intval($_POST['views_timeout']);
 	$views_options['display_home'] = intval($_POST['views_display_home']);
 	$views_options['display_single'] = intval($_POST['views_display_single']);
 	$views_options['display_page'] = intval($_POST['views_display_page']);
@@ -36,8 +38,18 @@ if( !empty($_POST['Update']) ) {
 		$botagent = array('bot', 'spider', 'slurp');
 	}
 	$views_options['botagent'] = $botagent;
+	if( $views_options['check_reflash'] ) {
+		$wpdb->query('CREATE TABLE IF NOT EXISTS `' . $wpdb->postviews_plus_reflash . '` (
+			`post_id` BIGINT(20) unsigned NOT NULL DEFAULT "0",
+			`user_ip` VARCHAR(100) NOT NULL DEFAULT "",
+			`look_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (`post_id`, `user_ip`),
+			INDEX (`look_time`))');
+	} else {
+		$wpdb->query('DROP TABLE `' . $wpdb->postviews_plus_reflash . '`');
+	}
 	if( update_option('PVP_options', $views_options) ) {
-		$text = '<font color="green">' . __('Updated Options Success', 'wp-postviews-plus') . '</font>';
+		$text = '<span style="color:green">' . __('Updated Options Success', 'wp-postviews-plus') . '</span>';
 	}
 }
 
@@ -45,6 +57,8 @@ if( !empty($_POST['Default']) ) {
 	delete_option('PVP_options');
 	$views_options = array();
 	$views_options['count'] = 1;
+	$views_options['check_reflash'] = 0;
+	$views_options['timeout'] = 300;
 	$views_options['display_home'] = 0;
 	$views_options['display_single'] = 0;
 	$views_options['display_page'] = 0;
@@ -57,7 +71,7 @@ if( !empty($_POST['Default']) ) {
 	$views_options['botagent'] = array('bot', 'spider', 'slurp');
 	$views_options['most_viewed_template'] = '<li><a href="%POST_URL%"  title="%POST_TITLE%">%POST_TITLE%</a> - %VIEW_COUNT% ' . __('views', 'wp-postviews-plus') . '</li>';
 	if( update_option('PVP_options', $views_options) ) {
-		$text = '<font color="green">' . __('Reset Optionsto Default Success', 'wp-postviews-plus') . '</font>';
+		$text = '<span style="color:green">' . __('Reset Optionsto Default Success', 'wp-postviews-plus') . '</span>';
 	}
 }
 
@@ -65,18 +79,35 @@ if( !empty($_POST['do']) ) {
 	switch($_POST['do']) {		
 		case __('UNINSTALL WP-PostViews Plus', 'wp-postviews-plus') :
 			if( trim($_POST['uninstall_views_yes']) == 'yes' ) {
-				global $wpdb;
 				echo '<div id="message" class="updated fade">';
+				if( $wpdb->query('DROP TABLE `' . $wpdb->postviews_plus . '`') ) {
+					echo '<p><span style="color:green">';
+					printf(__('Post Meta Key \'%s\' has been deleted.', 'wp-postviews-plus'), "<strong><em>{$wpdb->postviews_plus}</em></strong>");
+					echo '</span></p>';
+				} else {
+					echo '<p><span style="color:red">';
+					printf(__('Error deleting Post Meta Key \'%s\'.', 'wp-postviews-plus'), "<strong><em>{$wpdb->postviews_plus}</em></strong>");
+					echo '</span></p>';
+				}
+				if( $wpdb->query('DROP TABLE `' . $wpdb->postviews_plus_reflash . '`') ) {
+					echo '<p><span style="color:green">';
+					printf(__('Post Meta Key \'%s\' has been deleted.', 'wp-postviews-plus'), "<strong><em>{$wpdb->postviews_plus_reflash}</em></strong>");
+					echo '</span></p>';
+				} else {
+					echo '<p><span style="color:red">';
+					printf(__('Error deleting Post Meta Key \'%s\'.', 'wp-postviews-plus'), "<strong><em>{$wpdb->postviews_plus_reflash}</em></strong>");
+					echo '</span></p>';
+				}
 				echo '<p>';
 				foreach($views_settings as $setting) {
 					if( delete_option($setting) ) {
-						echo '<font color="green">';
+						echo '<span style="color:green">';
 						printf(__('Setting Key \'%s\' has been deleted.', 'wp-postviews-plus'), "<strong><em>{$setting}</em></strong>");
-						echo '</font><br />';
+						echo '</span><br />';
 					} else {
-						echo '<font color="red">';
+						echo '<span style="color:red">';
 						printf(__('Error deleting Setting Key \'%s\'.', 'wp-postviews-plus'), "<strong><em>{$setting}</em></strong>");
-						echo '</font><br />';
+						echo '</span><br />';
 					}
 				}
 				echo '</p>';
@@ -84,13 +115,13 @@ if( !empty($_POST['do']) ) {
 				foreach($views_postmetas as $postmeta) {
 					$remove_postmeta = $wpdb->query('DELETE FROM ' . $wpdb->postmeta . ' WHERE meta_key="' . $postmeta . '"');
 					if( $remove_postmeta ) {
-						echo '<font color="green">';
+						echo '<span style="color:green">';
 						printf(__('Post Meta Key \'%s\' has been deleted.', 'wp-postviews-plus'), "<strong><em>{$postmeta}</em></strong>");
-						echo '</font><br />';
+						echo '</span><br />';
 					} else {
-						echo '<font color="red">';
+						echo '<span style="color:red">';
 						printf(__('Error deleting Post Meta Key \'%s\'.', 'wp-postviews-plus'), "<strong><em>{$postmeta}</em></strong>");
-						echo '</font><br />';
+						echo '</span><br />';
 					}
 				}
 				echo '</p>';
@@ -113,7 +144,6 @@ if( !empty($_POST['do']) ) {
 <div class="wrap"><form method="post" action="">
 	<?php screen_icon(); ?>
 	<h2><?php _e('Post Views Plus Options', 'wp-postviews-plus'); ?></h2>
-	<p>&nbsp;</p>
 	<table class="widefat">
 		<thead><tr>
 			<th colspan="3"><?php _e('Basic Options', 'wp-postviews-plus'); ?></th>
@@ -129,24 +159,41 @@ if( !empty($_POST['do']) ) {
 			</td>
 		</tr>
 		<tr>
+			<td valign="top" rowspan="2"><strong><?php _e('Reflash check:', 'wp-postviews-plus'); ?></strong></td>
+			<td></td>
+			<td valign="top">
+				<select name="views_check_reflash" size="1">
+					<option value="0"<?php selected('0', $views_options['check_reflash']); ?>><?php _e('Close', 'wp-postviews-plus'); ?></option>
+					<option value="1"<?php selected('1', $views_options['check_reflash']); ?>><?php _e('Open', 'wp-postviews-plus'); ?></option>
+				</select>
+				<?php _e('Check is based on IP.', 'wp-postviews-plus'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php _e('Reflash timeout:', 'wp-postviews-plus'); ?></td>
+			<td valign="top">
+				<input type="text" id="views_timeout" name="views_timeout" size="10" value="<?php echo($views_options['timeout']); ?>" /><?php _e('second.', 'wp-postviews-plus'); ?>
+			</td>
+		</tr>
+		<tr>
 			<td valign="top" rowspan="3">
 				<strong><?php _e('Views Template:', 'wp-postviews-plus'); ?></strong>
 			</td>
-			<td>the views:</td>
+			<td><?php _e('All views:', 'wp-postviews-plus'); ?></td>
 			<td valign="top">
 				<input type="text" id="views_template_template" name="views_template_template" size="70" value="<?php echo htmlspecialchars(stripslashes($views_options['template'])); ?>" /><br />
 				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT%
 			</td>
 		</tr>
 		<tr>
-			<td>the user views:</td>
+			<td><?php _e('Only user views:', 'wp-postviews-plus'); ?></td>
 			<td valign="top">
 				<input type="text" id="views_template_user_template" name="views_template_user_template" size="70" value="<?php echo htmlspecialchars(stripslashes($views_options['user_template'])); ?>" /><br />
 				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT%
 			</td>
 		</tr>
 		<tr>
-			<td>the bot views:</td>
+			<td><?php _e('Only bot views:', 'wp-postviews-plus'); ?></td>
 			<td valign="top">
 				<input type="text" id="views_template_bot_template" name="views_template_bot_template" size="70" value="<?php echo htmlspecialchars(stripslashes($views_options['bot_template'])); ?>" /><br />
 				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT%
@@ -166,7 +213,7 @@ if( !empty($_POST['do']) ) {
 				<strong><?php _e('BOT User_agent:', 'wp-postviews-plus'); ?></strong>
 			</td>
 			<td valign="top">
-				<textarea cols="65" rows="<?php echo(count($views_options['botagent'])+1); ?>"  id="views_botagent" name="views_botagent"><?php echo htmlspecialchars(stripslashes(implode("\n",$views_options['botagent']))); ?></textarea><br />
+				<textarea cols="30" rows="<?php echo(count($views_options['botagent'])+1); ?>"  id="views_botagent" name="views_botagent"><?php echo htmlspecialchars(stripslashes(implode("\n",$views_options['botagent']))); ?></textarea><br />
 				<?php _e('For each BOT user_agent one line.', 'wp-postviews-plus'); ?>
 			</td>
 		</tr>
@@ -247,7 +294,8 @@ if( !empty($_POST['do']) ) {
 	<h3><?php _e('Uninstall WP-PostViews Plus', 'wp-postviews-plus'); ?></h3>
 	<p><?php _e('Deactivating WP-PostViews Plus plugin does not remove any data that may have been created, such as the views data. To completely remove this plugin, you can uninstall it here.', 'wp-postviews-plus'); ?></p>
 	<p style="color: red"><strong><?php _e('WARNING:', 'wp-postviews-plus'); ?></strong><br /><?php _e('Once uninstalled, this cannot be undone. You should use a Database Backup plugin of WordPress to back up all the data first.', 'wp-postviews-plus'); ?></p>
-	<p style="color: red"><?php printf(__('The database table <strong>%s</strong> will be DELETED.', 'wp-postviews-plus'), PVP_TABLE); ?></p>
+	<p style="color: red"><?php printf(__('The database table <strong>%s</strong> will be DELETED.', 'wp-postviews-plus'), $wpdb->postviews_plus); ?></p>
+	<p style="color: red"><?php printf(__('The database table <strong>%s</strong> will be DELETED.', 'wp-postviews-plus'), $wpdb->postviews_plus_reflash); ?></p>
 	<p style="color: red"><strong><?php _e('The following WordPress Options/PostMetas will be DELETED:', 'wp-postviews-plus'); ?></strong></p>
 	<table class="widefat">
 		<thead><tr>
