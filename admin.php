@@ -1,16 +1,18 @@
 <?php
-function postviews_plus_links($links, $file)
-{
-	if( $file == plugin_basename(dirname(__FILE__) . '/postviews_plus.php' ) )
-	{
+add_filter('plugin_action_links', 'postviews_plus_links', 10, 2);
+function postviews_plus_links($links, $file) {
+	if( $file == plugin_basename(dirname(__FILE__) . '/postviews_plus.php' ) ) {
 		$links[] = '<a href="options-general.php?page=postviews_plus">' . __('Settings', 'wp-postviews-plus') . '</a>';
 	}
 	return $links;
 }
-add_filter('plugin_action_links', 'postviews_plus_links', 10, 2);
+
+add_action('admin_menu', 'postviews_plus_admin');
+function postviews_plus_admin() {
+	add_submenu_page('options-general.php', 'WP-PostViews Plus', __('PostViews+', 'wp-postviews-plus'), 'manage_options', 'postviews_plus', 'postviews_plus_set');
+}
 
 function postviews_plus_set(){
-
 global $views_options, $wpdb;
 $views_settings = array('PVP_options', 'widget_views-plus');
 $views_postmetas = array('views', 'bot_views');
@@ -328,10 +330,4 @@ if( !empty($_POST['do']) ) {
 </form></div>
 <?php
 }
-
-function postviews_plus_admin()
-{
-	add_submenu_page('options-general.php', 'WP-PostViews Plus', __('PostViews+', 'wp-postviews-plus'), 'manage_options', 'postviews_plus', 'postviews_plus_set');
-}
-add_action('admin_menu', 'postviews_plus_admin');
 ?>

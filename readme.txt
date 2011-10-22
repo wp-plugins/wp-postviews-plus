@@ -3,7 +3,7 @@ Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
 Requires at least: 3.0.0
 Tested up to: 3.2.1
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 
 Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
@@ -16,8 +16,11 @@ To differentiate between USER and BOT is by HTTP_agent, and it can set at admin
 2. Activate the plugin 'WP-PostViews Plus' through the 'Plugins' menu in WordPress.
 3. Place the show views function in your templates. [function reference](http://wwpteach.com/wp-postviews-plus/2 "function reference")
 
-== Screenshots ==
+= Usage =
+You need edit you theme to show the post views.
+Add `<?php if(function_exists('the_views')) { the_views(); } ?>` to show the post views in your page.
 
+== Screenshots ==
 1. Using page
 2. setting page
 
