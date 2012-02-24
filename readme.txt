@@ -3,12 +3,13 @@ Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
 Requires at least: 3.0.0
 Tested up to: 3.3.1
-Stable tag: 1.2.8.2
+Stable tag: 1.2.9
 
-Enables you yo display how many times a Post had been viewed by user or bot.
+Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
 == Description ==
-To differentiate between USER and BOT is by HTTP_agent, and it can set at admin.
+It can set that if count the registered member views OR views in index page.
+To differentiate between USER and BOT is by HTTP_agent, and it can set at admin
 
 == Installation ==
 1. Upload 'postviews_plus' directory to the '/wp-content/plugins/' directory.

@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.2.8.1
+Version: 1.2.9
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -36,6 +36,7 @@ if( $views_options && !isset($views_options['timeout']) ) {
 }
 
 include(dirname( __FILE__ ) . '/widget.php');
+include(dirname( __FILE__ ) . '/update.php');
 
 if( is_admin() ) {
 	$currentLocale = get_locale();
@@ -165,6 +166,7 @@ function add_cache_stats($addin, $id, $with_bot = true, $type = '') {
 	$count_id = md5($_SERVER['REQUEST_URI']);
 	if( $first_run ) {
 		$wpdb->query('DELETE FROM ' . $wpdb->postviews_plus . ' WHERE count_id="' . $count_id . '"');
+		$wpdb->query('DELETE FROM ' . $wpdb->postviews_plus . ' WHERE add_time<"' . (time() - 86400 * 7) . '"');
 		$first_run = false;
 	}
 	$data = $wpdb->get_row('SELECT * FROM ' . $wpdb->postviews_plus . ' WHERE count_id="' . $count_id . '"');
@@ -199,11 +201,11 @@ function add_cache_stats($addin, $id, $with_bot = true, $type = '') {
 	} else {
 		switch( $addin ) {
 			case 'tv':
-				$wpdb->insert($wpdb->postviews_plus, array('tv' => $id, 'count_id' => $count_id));
+				$wpdb->insert($wpdb->postviews_plus, array('tv' => $id, 'count_id' => $count_id, 'add_time' => time()));
 				break;
 			case 'gt':
 				$add_word = get_totalviews_stats_word($id, $with_bot, $type);
-				$wpdb->insert($wpdb->postviews_plus, array('gt' => $add_word, 'count_id' => $count_id));
+				$wpdb->insert($wpdb->postviews_plus, array('gt' => $add_word, 'count_id' => $count_id, 'add_time' => time()));
 				break;
 		}
 	}
@@ -526,10 +528,12 @@ function pp_views_init() {
 	add_option('PVP_options', $views_options, 'Post Views Plus Options');
 	$wpdb->query('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviews_plus (
 		`count_id` VARCHAR(32) NOT NULL,
+		`add_time` int(10) unsigned NOT NULL,
 		`tv` VARCHAR(255) NOT NULL,
 		`gt` VARCHAR(255) NOT NULL,
 		PRIMARY KEY (`count_id`))');
 	$wpdb->query('DROP TABLE `' . $wpdb->prefix . 'postviewsplus`');
+	update_option('PVP_version', '1.2.9');
 	delete_option('PV+_botagent');
 	delete_option('PV+_option');
 	delete_option('PV+_useragent');

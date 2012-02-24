@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-22 16:04+0800\n"
-"PO-Revision-Date: 2011-10-22 16:04+0800\n"
+"POT-Creation-Date: 2012-02-24 10:16+0800\n"
+"PO-Revision-Date: 2012-02-24 10:16+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <fantasyworldidvtw@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -29,18 +29,18 @@ msgstr "成功的更新設定"
 
 #: ../admin.php:70
 #: ../admin.php:74
-#: ../postviews_plus.php:520
-#: ../postviews_plus.php:524
+#: ../postviews_plus.php:523
+#: ../postviews_plus.php:527
 msgid "views"
 msgstr "瀏覽數"
 
 #: ../admin.php:71
-#: ../postviews_plus.php:521
+#: ../postviews_plus.php:524
 msgid "user views"
 msgstr "使用者瀏覽數"
 
 #: ../admin.php:72
-#: ../postviews_plus.php:522
+#: ../postviews_plus.php:525
 msgid "bot views"
 msgstr "機器人瀏覽數"
 
@@ -298,11 +298,19 @@ msgstr ""
 "\\n"
 "點選 [取消] 來停止動作， [確定]執行刪除"
 
-#: ../postviews_plus.php:328
+#: ../admin.php:332
+msgid "Thank"
+msgstr "感謝"
+
+#: ../admin.php:333
+msgid "Translation contributors"
+msgstr "翻譯貢獻者"
+
+#: ../postviews_plus.php:330
 msgid "There is no excerpt because this is a protected post."
 msgstr "文章受密碼保護，無法產生摘要。"
 
-#: ../postviews_plus.php:394
+#: ../postviews_plus.php:396
 msgid "N/A"
 msgstr "沒有文章"
 

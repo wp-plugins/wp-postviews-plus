@@ -328,6 +328,11 @@ if( !empty($_POST['do']) ) {
 	<p style="text-align:center"><input type="checkbox" name="uninstall_views_yes" value="yes" />&nbsp;<?php _e('Yes', 'wp-postviews-plus'); ?></p>
 	<p style="text-align:center"><input type="submit" name="do" value="<?php _e('UNINSTALL WP-PostViews Plus', 'wp-postviews-plus'); ?>" class="button" onclick="return confirm('<?php _e('You Are About To Uninstall WP-PostViews Plus From WordPress.\nThis Action Is Not Reversible.\n\n Choose [Cancel] To Stop, [OK] To Uninstall.', 'wp-postviews-plus'); ?>')" /></p>
 </form></div>
+<div class="wrap">
+	<h3><?php _e('Thank', 'wp-postviews-plus'); ?></h3>
+	<p><?php _e('Translation contributors', 'wp-postviews-plus'); ?>：</p>
+	<p>zh_CN(简体中文) By ddbiz</p>
+</div>
 <?php
 }
 ?>
