@@ -2,8 +2,8 @@
 Contributors: Richer Yang
 Tags: views,hits,counter,postviews,bot,user
 Requires at least: 3.0.0
-Tested up to: 3.3.1
-Stable tag: 1.2.9
+Tested up to: 3.3.2
+Stable tag: 1.2.10
 
 Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
 
@@ -23,6 +23,7 @@ Add `<?php if(function_exists('the_views')) { the_views(); } ?>` to show the pos
 == Screenshots ==
 1. Using page
 2. setting page
+3. widget setting page
 
 == Frequently Asked Questions ==
 Please visit the [plugin page](http://wwpteach.com/wp-postviews-plus " ") with any questions.

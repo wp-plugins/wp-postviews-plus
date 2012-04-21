@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-24 10:16+0800\n"
-"PO-Revision-Date: 2012-02-24 10:16+0800\n"
+"POT-Creation-Date: 2012-04-21 15:22+0800\n"
+"PO-Revision-Date: 2012-04-21 15:22+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <fantasyworldidvtw@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -29,18 +29,18 @@ msgstr "成功的更新設定"
 
 #: ../admin.php:70
 #: ../admin.php:74
+#: ../postviews_plus.php:519
 #: ../postviews_plus.php:523
-#: ../postviews_plus.php:527
 msgid "views"
 msgstr "瀏覽數"
 
 #: ../admin.php:71
-#: ../postviews_plus.php:524
+#: ../postviews_plus.php:520
 msgid "user views"
 msgstr "使用者瀏覽數"
 
 #: ../admin.php:72
-#: ../postviews_plus.php:525
+#: ../postviews_plus.php:521
 msgid "bot views"
 msgstr "機器人瀏覽數"
 
@@ -306,11 +306,11 @@ msgstr "感謝"
 msgid "Translation contributors"
 msgstr "翻譯貢獻者"
 
-#: ../postviews_plus.php:330
+#: ../postviews_plus.php:326
 msgid "There is no excerpt because this is a protected post."
 msgstr "文章受密碼保護，無法產生摘要。"
 
-#: ../postviews_plus.php:396
+#: ../postviews_plus.php:392
 msgid "N/A"
 msgstr "沒有文章"
 
@@ -391,6 +391,10 @@ msgstr "最多標題字數："
 #: ../widget.php:136
 msgid "<strong>0</strong> to disable."
 msgstr "<strong>0</strong> 不限制"
+
+#: ../widget.php:136
+msgid " Chinese characters to calculate the two words!"
+msgstr "中文字計算為 2 字數"
 
 #: ../widget.php:139
 msgid "With BOT Views:"

@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.2.9
+Version: 1.2.10
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -309,15 +309,11 @@ function get_totalviews_tag($tag_id = 1, $display = true, $with_bot = true) {
 function pp_snippet_text($text, $length = 0) {
 	if( defined('MB_OVERLOAD_STRING') ) {
 		$text = @html_entity_decode($text, ENT_QUOTES, get_option('blog_charset'));
-	 	if( mb_strlen($text) > $length ) {
-			return htmlentities(mb_strimwidth($text, 0, $length, '...'), ENT_COMPAT, get_option('blog_charset'));
-	 	} else {
-			return htmlentities($text, ENT_COMPAT, get_option('blog_charset'));
-	 	}
+		return htmlentities(mb_strimwidth($text, 0, $length, '...'), ENT_COMPAT, get_option('blog_charset'));
 	} else {
 		$text = @html_entity_decode($text, ENT_QUOTES, get_option('blog_charset'));
 	 	if( strlen($text) > $length ) {
-			return htmlentities(substr($text,0,$length), ENT_COMPAT, get_option('blog_charset')).'...';
+			return htmlentities(substr($text, 0, $length), ENT_COMPAT, get_option('blog_charset')) . '...';
 	 	} else {
 			return htmlentities($text, ENT_COMPAT, get_option('blog_charset'));
 	 	}
@@ -382,8 +378,8 @@ function get_timespan_most_viewed_term($term_id = 1, $mode = null, $limit = 10, 
 	}
 	if( $days > 0 ) {
 		$limit_date = time() - ($days * 86400);
-		$limit_date = gmdate('Y-m-d H:i:s', $limit_date);
-		$where .= ' AND p.post_date > "' . $limit_date . '"';
+		$limit_date = gmdate('Y-m-d', $limit_date);
+		$where .= ' AND (left(p.post_date, 10) > "' . $limit_date . '" OR left(p.post_modified, 10) > "' . $limit_date . '")';
 	}
 
 	$most_viewed = $wpdb->get_results('SELECT DISTINCT p.ID, p.post_title, p.post_excerpt, p.post_content, post_password, p.post_date, ' . $views . ' AS views FROM ' . $wpdb->posts . ' AS p ' . $left_join . $inner_join . ' WHERE p.post_date<"' . current_time('mysql') . '" AND ' . $where . '  AND p.post_status="publish" AND p.post_password="" ORDER BY views DESC LIMIT ' . $limit);

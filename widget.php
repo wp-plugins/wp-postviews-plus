@@ -14,8 +14,22 @@ class WP_Widget_PostViews_Plus extends WP_Widget {
 	function WP_Widget_PostViews_Plus() {
 		$widget_ops = array('description' => __('WP-PostViews plus views statistics', 'wp-postviews-plus'));
 		$this->WP_Widget('views-plus', __('Views Stats', 'wp-postviews-plus'), $widget_ops);
+		add_action('save_post', array(&$this, 'flush_widget_cache'));
+		add_action('deleted_post', array(&$this, 'flush_widget_cache'));
 	}
 	function widget($args, $instance) {
+		$cache = wp_cache_get('widget_postviews_plus', 'widget');
+		if( !is_array($cache) ) {
+			$cache = array();
+		}
+		if( !isset($args['widget_id']) ) {
+			$args['widget_id'] = $this->id;
+		}
+		if( isset($cache[$args['widget_id']]) ) {
+			echo $cache[$args['widget_id']];
+			return;
+		}
+		ob_start();
 		extract($args);
 		$title = apply_filters('widget_title', esc_attr($instance['title']));
 		$type = esc_attr($instance['type']);
@@ -43,6 +57,8 @@ class WP_Widget_PostViews_Plus extends WP_Widget {
 		}
 		echo '</ul>'."\n";
 		echo $after_widget;
+		$cache[$args['widget_id']] = ob_get_flush();
+		wp_cache_set('widget_postviews_plus', $cache, 'widget');
 	}
 	function update($new_instance, $old_instance) {
 		if( !isset($new_instance['submit']) ) {
@@ -72,7 +88,11 @@ class WP_Widget_PostViews_Plus extends WP_Widget {
 			$instance['cat_ids'] = array(1);
 		}
 		$instance['tag_ids'] = strip_tags($new_instance['tag_ids']);
+		$this->flush_widget_cache();
 		return $instance;
+	}
+	function flush_widget_cache() {
+		wp_cache_delete('widget_postviews_plus', 'widget');
 	}
 	function form($instance) {
 		global $wpdb;
@@ -133,7 +153,7 @@ class WP_Widget_PostViews_Plus extends WP_Widget {
 			<input name="<?php echo $this->get_field_name('limit'); ?>" type="text" id="<?php echo $this->get_field_id('limit'); ?>" value="<?php echo $limit; ?>" size="4" maxlength="2" />
 			<br />
 			<label for="<?php echo $this->get_field_id('chars'); ?>"><?php _e('Maximum Post Title Length (Characters):', 'wp-postviews-plus'); ?></label>
-			<input id="<?php echo $this->get_field_id('chars'); ?>" name="<?php echo $this->get_field_name('chars'); ?>" type="text" value="<?php echo $chars; ?>" size="4" /><small><?php _e('<strong>0</strong> to disable.', 'wp-postviews-plus'); ?></small>
+			<input id="<?php echo $this->get_field_id('chars'); ?>" name="<?php echo $this->get_field_name('chars'); ?>" type="text" value="<?php echo $chars; ?>" size="4" /><br /><small><?php _e('<strong>0</strong> to disable.', 'wp-postviews-plus'); ?> <?php _e(' Chinese characters to calculate the two words!', 'wp-postviews-plus'); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('withbot'); ?>"><?php _e('With BOT Views:', 'wp-postviews-plus'); ?></label>

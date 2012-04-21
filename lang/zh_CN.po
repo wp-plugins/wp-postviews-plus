@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-24 10:15+0800\n"
-"PO-Revision-Date: 2012-02-24 10:16+0800\n"
+"POT-Creation-Date: 2012-04-21 15:22+0800\n"
+"PO-Revision-Date: 2012-04-21 15:22+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <suvizhang@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -29,18 +29,18 @@ msgstr "成功的更新设定"
 
 #: ../admin.php:70
 #: ../admin.php:74
+#: ../postviews_plus.php:519
 #: ../postviews_plus.php:523
-#: ../postviews_plus.php:527
 msgid "views"
 msgstr "浏览数"
 
 #: ../admin.php:71
-#: ../postviews_plus.php:524
+#: ../postviews_plus.php:520
 msgid "user views"
 msgstr "使用者浏览数"
 
 #: ../admin.php:72
-#: ../postviews_plus.php:525
+#: ../postviews_plus.php:521
 msgid "bot views"
 msgstr "机器人浏览数"
 
@@ -299,18 +299,18 @@ msgstr ""
 "点选 [取消] 来终止删除， [确定]执行删除"
 
 #: ../admin.php:332
-msgid "Think"
+msgid "Thank"
 msgstr "感谢"
 
 #: ../admin.php:333
 msgid "Translation contributors"
 msgstr "翻译贡献者"
 
-#: ../postviews_plus.php:330
+#: ../postviews_plus.php:326
 msgid "There is no excerpt because this is a protected post."
 msgstr "文章首密码保护，无法产生摘要。"
 
-#: ../postviews_plus.php:396
+#: ../postviews_plus.php:392
 msgid "N/A"
 msgstr "沒有文章"
 
@@ -391,6 +391,10 @@ msgstr "最多标题字数："
 #: ../widget.php:136
 msgid "<strong>0</strong> to disable."
 msgstr "<strong>0</strong> 不限制"
+
+#: ../widget.php:136
+msgid " Chinese characters to calculate the two words!"
+msgstr "中文字计算为2字数"
 
 #: ../widget.php:139
 msgid "With BOT Views:"
