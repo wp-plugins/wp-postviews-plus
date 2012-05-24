@@ -207,7 +207,7 @@ if( !empty($_POST['do']) ) {
 			</td>
 			<td valign="top">
 				<textarea cols="65" rows="4"  id="views_template_most_viewed" name="views_template_most_viewed"><?php echo htmlspecialchars(stripslashes($views_options['most_viewed_template'])); ?></textarea><br />
-				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?><br /> - %VIEW_COUNT% - %POST_TITLE% - %POST_EXCERPT% - %POST_CONTENT% - %POST_DATE% - %POST_URL%
+				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT% - %POST_TITLE% - %POST_EXCERPT% - %POST_CONTENT% - %POST_DATE% - %POST_URL% - %POST_THUMBNAIL%
 			</td>
 		</tr>
 		<tr>
