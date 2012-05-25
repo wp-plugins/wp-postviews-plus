@@ -32,6 +32,8 @@ if( !empty($_POST['Update']) ) {
 	$views_options['user_template'] = trim($_POST['views_template_user_template']);
 	$views_options['bot_template'] = trim($_POST['views_template_bot_template']);
 	$views_options['most_viewed_template'] = trim($_POST['views_template_most_viewed']);
+	$views_options['set_thumbnail_size_h'] = intval($_POST['set_thumbnail_size_h']);
+	$views_options['set_thumbnail_size_w'] = intval($_POST['set_thumbnail_size_w']);
 	$botagent = explode("\r\n", trim($_POST['views_botagent']));
 	if( !is_array($botagent) ) {
 		$botagent = explode("\n", trim($_POST['views_botagent']));
@@ -72,6 +74,8 @@ if( !empty($_POST['Default']) ) {
 	$views_options['bot_template'] = '%VIEW_COUNT% ' . __('bot views', 'wp-postviews-plus');
 	$views_options['botagent'] = array('bot', 'spider', 'slurp');
 	$views_options['most_viewed_template'] = '<li><a href="%POST_URL%"  title="%POST_TITLE%">%POST_TITLE%</a> - %VIEW_COUNT% ' . __('views', 'wp-postviews-plus') . '</li>';
+	$views_options['set_thumbnail_size_w'] = 30;
+	$views_options['set_thumbnail_size_w'] = 30;
 	if( update_option('PVP_options', $views_options) ) {
 		$text = '<span style="color:green">' . __('Reset Optionsto Default Success', 'wp-postviews-plus') . '</span>';
 	}
@@ -207,7 +211,9 @@ if( !empty($_POST['do']) ) {
 			</td>
 			<td valign="top">
 				<textarea cols="65" rows="4"  id="views_template_most_viewed" name="views_template_most_viewed"><?php echo htmlspecialchars(stripslashes($views_options['most_viewed_template'])); ?></textarea><br />
-				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT% - %POST_TITLE% - %POST_EXCERPT% - %POST_CONTENT% - %POST_DATE% - %POST_URL% - %POST_THUMBNAIL%
+				<?php _e('Allowed Variables:', 'wp-postviews-plus'); ?> - %VIEW_COUNT% - %POST_TITLE% - %POST_EXCERPT% - %POST_CONTENT% - %POST_DATE% - %POST_URL% - %POST_THUMBNAIL%<br />
+				<?php _e('Size of post thumbnail: ', 'wp-postviews-plus'); _e('Width: ', 'wp-postviews-plus'); ?> <input type="text" id="set_thumbnail_size_w" name="set_thumbnail_size_w" size="10" value="<?php echo($views_options['set_thumbnail_size_w']); ?>" />
+				<?php _e('Height: ', 'wp-postviews-plus'); ?> <input type="text" id="set_thumbnail_size_h" name="set_thumbnail_size_h" size="10" value="<?php echo($views_options['set_thumbnail_size_h']); ?>" />
 			</td>
 		</tr>
 		<tr>

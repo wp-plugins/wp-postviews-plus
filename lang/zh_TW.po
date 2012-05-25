@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-21 15:22+0800\n"
-"PO-Revision-Date: 2012-04-21 15:22+0800\n"
+"POT-Creation-Date: 2012-05-25 08:53+0800\n"
+"PO-Revision-Date: 2012-05-25 08:54+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <fantasyworldidvtw@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -29,18 +29,18 @@ msgstr "成功的更新設定"
 
 #: ../admin.php:70
 #: ../admin.php:74
-#: ../postviews_plus.php:519
-#: ../postviews_plus.php:523
+#: ../postviews_plus.php:530
+#: ../postviews_plus.php:534
 msgid "views"
 msgstr "瀏覽數"
 
 #: ../admin.php:71
-#: ../postviews_plus.php:520
+#: ../postviews_plus.php:531
 msgid "user views"
 msgstr "使用者瀏覽數"
 
 #: ../admin.php:72
-#: ../postviews_plus.php:521
+#: ../postviews_plus.php:532
 msgid "bot views"
 msgstr "機器人瀏覽數"
 
@@ -49,7 +49,7 @@ msgid "Reset Optionsto Default Success"
 msgstr "成功的回復到預設值"
 
 #: ../admin.php:82
-#: ../admin.php:329
+#: ../admin.php:331
 msgid "UNINSTALL WP-PostViews Plus"
 msgstr "停用 WP-PostViews Plus 外掛"
 
@@ -78,7 +78,7 @@ msgid "Error deleting Setting Key '%s'."
 msgstr "設定值 '%s' 刪除失敗"
 
 #: ../admin.php:136
-#: ../admin.php:296
+#: ../admin.php:298
 msgid "Uninstall WP-PostViews Plus"
 msgstr "停用 WP-PostViews Plus 外掛"
 
@@ -162,131 +162,143 @@ msgstr "只有機器人瀏覽數："
 msgid "Most Viewed Template:"
 msgstr "最多人瀏覽的樣板："
 
-#: ../admin.php:215
+#: ../admin.php:211
+msgid "Size of post thumbnail: "
+msgstr "特色圖片大小："
+
+#: ../admin.php:211
+msgid "Width: "
+msgstr "寬度："
+
+#: ../admin.php:212
+msgid "Height: "
+msgstr "高度："
+
+#: ../admin.php:217
 msgid "BOT User_agent:"
 msgstr "機器人的 User_agent"
 
-#: ../admin.php:219
+#: ../admin.php:221
 msgid "For each BOT user_agent one line."
 msgstr "每一個 BOT User_agent 一行"
 
-#: ../admin.php:226
+#: ../admin.php:228
 msgid "Display Options"
 msgstr "顯示設定"
 
-#: ../admin.php:229
+#: ../admin.php:231
 msgid "Home Page:"
 msgstr "首頁："
 
-#: ../admin.php:232
-#: ../admin.php:243
-#: ../admin.php:253
-#: ../admin.php:263
-#: ../admin.php:273
-#: ../admin.php:283
+#: ../admin.php:234
+#: ../admin.php:245
+#: ../admin.php:255
+#: ../admin.php:265
+#: ../admin.php:275
+#: ../admin.php:285
 msgid "Display to everyone"
 msgstr "顯示給所有人"
 
-#: ../admin.php:233
-#: ../admin.php:244
-#: ../admin.php:254
-#: ../admin.php:264
-#: ../admin.php:274
-#: ../admin.php:284
+#: ../admin.php:235
+#: ../admin.php:246
+#: ../admin.php:256
+#: ../admin.php:266
+#: ../admin.php:276
+#: ../admin.php:286
 msgid "Display to registered users only"
 msgstr "只顯示給註冊的使用者"
 
-#: ../admin.php:234
+#: ../admin.php:236
 msgid "Don't display on home page"
 msgstr "在首頁不要顯示"
 
-#: ../admin.php:237
+#: ../admin.php:239
 msgid "These options specify where the view counts should be displayed and to whom.<br />Note that the theme files must contain a call to <code>the_views()</code> in order for any view count to be displayed."
 msgstr "這選項讓你可以針對指定版面決定是否顯示瀏覽數。<br />注意：主題樣板中必須呼叫 <code>the_views()</code> 系列函數來顯示瀏覽次數。"
 
-#: ../admin.php:240
+#: ../admin.php:242
 msgid "Singe Posts:"
 msgstr "單一文章："
 
-#: ../admin.php:245
+#: ../admin.php:247
 msgid "Don't display on single posts"
 msgstr "不要在單一文章頁面顯示"
 
-#: ../admin.php:250
+#: ../admin.php:252
 msgid "Pages:"
 msgstr "獨立分頁："
 
-#: ../admin.php:255
+#: ../admin.php:257
 msgid "Don't display on pages"
 msgstr "不要在獨立頁面顯示"
 
-#: ../admin.php:260
+#: ../admin.php:262
 msgid "Archive Pages:"
 msgstr "匯整頁面："
 
-#: ../admin.php:265
+#: ../admin.php:267
 msgid "Don't display on archive pages"
 msgstr "不要在匯整頁面顯示"
 
-#: ../admin.php:270
+#: ../admin.php:272
 msgid "Search Pages:"
 msgstr "搜尋頁面"
 
-#: ../admin.php:275
+#: ../admin.php:277
 msgid "Don't display on search pages"
 msgstr "不要在搜尋頁面顯示"
 
-#: ../admin.php:280
+#: ../admin.php:282
 msgid "Other Pages:"
 msgstr "其他頁面："
 
-#: ../admin.php:285
+#: ../admin.php:287
 msgid "Don't display on other pages"
 msgstr "不要在其他頁面顯示"
 
-#: ../admin.php:291
+#: ../admin.php:293
 msgid "Save Changes"
 msgstr "儲存變更"
 
-#: ../admin.php:292
+#: ../admin.php:294
 msgid "Reset to Default"
 msgstr "回覆預設值"
 
-#: ../admin.php:297
+#: ../admin.php:299
 msgid "Deactivating WP-PostViews Plus plugin does not remove any data that may have been created, such as the views data. To completely remove this plugin, you can uninstall it here."
 msgstr "停用 WP-PostViews Plus 外掛不會移除任何由其建立的資料，例如瀏覽數。為了完整的移除外掛，你可以從這裡移除。"
 
-#: ../admin.php:298
+#: ../admin.php:300
 msgid "WARNING:"
 msgstr "注意："
 
-#: ../admin.php:298
+#: ../admin.php:300
 msgid "Once uninstalled, this cannot be undone. You should use a Database Backup plugin of WordPress to back up all the data first."
 msgstr "一但刪除之後，將無法復原。如果你想要保留資料請先行將 WordPress 的資料庫備份"
 
-#: ../admin.php:299
-#: ../admin.php:300
+#: ../admin.php:301
+#: ../admin.php:302
 #, php-format
 msgid "The database table <strong>%s</strong> will be DELETED."
 msgstr "資料表 <strong>%s</strong> 將被刪除"
 
-#: ../admin.php:301
+#: ../admin.php:303
 msgid "The following WordPress Options/PostMetas will be DELETED:"
 msgstr "以下的 WordPress 設定與文章的自訂欄位將被刪除："
 
-#: ../admin.php:304
+#: ../admin.php:306
 msgid "WordPress Options"
 msgstr "WordPress 設定值"
 
-#: ../admin.php:305
+#: ../admin.php:307
 msgid "WordPress PostMetas"
 msgstr "文章自訂欄位"
 
-#: ../admin.php:328
+#: ../admin.php:330
 msgid "Yes"
 msgstr "是的"
 
-#: ../admin.php:329
+#: ../admin.php:331
 msgid ""
 "You Are About To Uninstall WP-PostViews Plus From WordPress.\\n"
 "This Action Is Not Reversible.\\n"
@@ -298,11 +310,11 @@ msgstr ""
 "\\n"
 "點選 [取消] 來停止動作， [確定]執行刪除"
 
-#: ../admin.php:332
+#: ../admin.php:334
 msgid "Thank"
 msgstr "感謝"
 
-#: ../admin.php:333
+#: ../admin.php:335
 msgid "Translation contributors"
 msgstr "翻譯貢獻者"
 
@@ -310,7 +322,7 @@ msgstr "翻譯貢獻者"
 msgid "There is no excerpt because this is a protected post."
 msgstr "文章受密碼保護，無法產生摘要。"
 
-#: ../postviews_plus.php:392
+#: ../postviews_plus.php:403
 msgid "N/A"
 msgstr "沒有文章"
 
@@ -322,89 +334,89 @@ msgstr "WP-PostViews plus 的瀏覽排行"
 msgid "Views Stats"
 msgstr "瀏覽數排行"
 
-#: ../widget.php:79
+#: ../widget.php:99
 msgid "Views"
 msgstr "瀏覽數"
 
-#: ../widget.php:93
+#: ../widget.php:113
 msgid "Title:"
 msgstr "標題："
 
-#: ../widget.php:97
+#: ../widget.php:117
 msgid "Statistics Type:"
 msgstr "排行型態："
 
-#: ../widget.php:99
-#: ../widget.php:111
+#: ../widget.php:119
+#: ../widget.php:131
 msgid "Most Viewed"
 msgstr "最多人瀏覽"
 
-#: ../widget.php:100
+#: ../widget.php:120
 msgid "Most Viewed By Category"
 msgstr "依分類最多人瀏覽"
 
-#: ../widget.php:101
+#: ../widget.php:121
 msgid "Most Viewed By Tag"
 msgstr "依標籤最多人瀏覽"
 
-#: ../widget.php:105
+#: ../widget.php:125
 msgid "Include Views From:"
 msgstr "包含的頁面型態："
 
-#: ../widget.php:107
+#: ../widget.php:127
 msgid "Posts &amp; Pages"
 msgstr "文章 &amp; 分頁"
 
-#: ../widget.php:108
+#: ../widget.php:128
 msgid "Posts Only"
 msgstr "只有文章"
 
-#: ../widget.php:109
+#: ../widget.php:129
 msgid "Pages Only"
 msgstr "只有分頁"
 
-#: ../widget.php:111
+#: ../widget.php:131
 msgid "Only work with "
 msgstr "只作用於"
 
-#: ../widget.php:114
+#: ../widget.php:134
 msgid "Category IDs:"
 msgstr "分類 ID："
 
-#: ../widget.php:124
-#: ../widget.php:129
+#: ../widget.php:144
+#: ../widget.php:149
 msgid "Seperate mutiple categories with commas."
 msgstr "多個分類以 ',' 區分"
 
-#: ../widget.php:127
+#: ../widget.php:147
 msgid "Tag IDs:"
 msgstr "標籤 ID："
 
-#: ../widget.php:132
+#: ../widget.php:152
 msgid "No. Of Records To Show:"
 msgstr "顯示的文章數量："
 
-#: ../widget.php:135
+#: ../widget.php:155
 msgid "Maximum Post Title Length (Characters):"
 msgstr "最多標題字數："
 
-#: ../widget.php:136
+#: ../widget.php:156
 msgid "<strong>0</strong> to disable."
 msgstr "<strong>0</strong> 不限制"
 
-#: ../widget.php:136
+#: ../widget.php:156
 msgid " Chinese characters to calculate the two words!"
 msgstr "中文字計算為 2 字數"
 
-#: ../widget.php:139
+#: ../widget.php:159
 msgid "With BOT Views:"
 msgstr "包含機器人的瀏覽："
 
-#: ../widget.php:141
+#: ../widget.php:161
 msgid "With BOT"
 msgstr "包含機器人"
 
-#: ../widget.php:142
+#: ../widget.php:162
 msgid "Without BOT"
 msgstr "不包含機器人"
 

@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 1.2.11.1
+Version: 1.2.12
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 */
@@ -333,14 +333,24 @@ function views_post_excerpt($post_excerpt, $post_content, $post_password, $chars
 	}
 }
 
+function WP_pvp_post_thumbnail_html($img_html) {
+	global $views_options;
+	$img_html = preg_replace('@ width="[0-9]*" @i', ' ', $img_html);
+	$img_html = preg_replace('@ height="[0-9]*" @i', ' ', $img_html);
+	$img_html = substr($img_html, 0, 4) . ' width="' . $views_options['set_thumbnail_size_w'] . '" height="' . $views_options['set_thumbnail_size_h'] . '" ' . substr($img_html, 0, -4);
+	return $img_html;
+}
+
 function my_str_replace($template, $post, $chars) {
 	$post_views = intval($post->views);
 	$post_title = isset($post->post_title) ? $post->post_title : '';
 	if( $chars > 0 ) {
 		$post_title = pp_snippet_text($post_title, $chars);
 	}
-	if( function_exists('has_post_thumbnail') && has_post_thumbnail($post->ID) ) {
-		$thumbnail = get_the_post_thumbnail($post->ID, 'pv-post-thumbnail');
+	if( function_exists('get_the_post_thumbnail') ) {
+		add_filter('post_thumbnail_html', 'WP_pvp_post_thumbnail_html');
+		$thumbnail = get_the_post_thumbnail($post->ID, 'post-thumbnail');
+		remove_filter('post_thumbnail_html', 'WP_pvp_post_thumbnail_html');
 	} else {
 		$thumbnail = '';
 	}
@@ -527,6 +537,8 @@ function pp_views_init() {
 	$views_options['bot_template'] = '%VIEW_COUNT% ' . __('bot views', 'wp-postviews-plus');
 	$views_options['botagent'] = array('bot', 'spider', 'slurp');
 	$views_options['most_viewed_template'] = '<li><a href="%POST_URL%"  title="%POST_TITLE%">%POST_TITLE%</a> - %VIEW_COUNT% ' . __('views', 'wp-postviews-plus') . '</li>';
+	$views_options['set_thumbnail_size_w'] = 30;
+	$views_options['set_thumbnail_size_w'] = 30;
 	add_option('PVP_options', $views_options, 'Post Views Plus Options');
 	$wpdb->query('CREATE TABLE IF NOT EXISTS ' . $wpdb->prefix . 'postviews_plus (
 		`count_id` VARCHAR(32) NOT NULL,
