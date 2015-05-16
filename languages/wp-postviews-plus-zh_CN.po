@@ -2,411 +2,408 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP-PostViews Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-21 15:22+0800\n"
-"PO-Revision-Date: 2012-04-21 15:22+0800\n"
+"POT-Creation-Date: 2015-05-16 22:05+0800\n"
+"PO-Revision-Date: 2015-05-16 22:05+0800\n"
 "Last-Translator: Richer Yang <fantasyworldidvtw@gmail.com>\n"
 "Language-Team:  <suvizhang@gmail.com>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-Country: China\n"
 "X-Poedit-SourceCharset: gb2312\n"
+"X-Generator: Poedit 1.7.4\n"
 "X-Poedit-SearchPath-0: ./..\n"
 
-#: ../admin.php:5
+#: ../class.wp-pvp.admin.php:28
 msgid "Settings"
 msgstr "设定"
 
-#: ../admin.php:12
+#: ../class.wp-pvp.admin.php:35
 msgid "PostViews+"
 msgstr "浏览数+"
 
-#: ../admin.php:54
+#: ../class.wp-pvp.admin.php:81
 msgid "Updated Options Success"
 msgstr "成功的更新设定"
 
-#: ../admin.php:70
-#: ../admin.php:74
-#: ../postviews_plus.php:519
-#: ../postviews_plus.php:523
-msgid "views"
-msgstr "浏览数"
-
-#: ../admin.php:71
-#: ../postviews_plus.php:520
-msgid "user views"
-msgstr "使用者浏览数"
-
-#: ../admin.php:72
-#: ../postviews_plus.php:521
-msgid "bot views"
-msgstr "机器人浏览数"
-
-#: ../admin.php:76
+#: ../class.wp-pvp.admin.php:87
 msgid "Reset Optionsto Default Success"
 msgstr "成功的恢复到预设值"
 
-#: ../admin.php:82
-#: ../admin.php:329
-msgid "UNINSTALL WP-PostViews Plus"
-msgstr "停用 WP-PostViews Plus"
-
-#: ../admin.php:87
-#: ../admin.php:96
-#: ../admin.php:121
-#, php-format
-msgid "Post Meta Key '%s' has been deleted."
-msgstr "文章自订栏位 '%s' 已经被删除"
-
-#: ../admin.php:91
-#: ../admin.php:100
-#: ../admin.php:125
-#, php-format
-msgid "Error deleting Post Meta Key '%s'."
-msgstr "文章自订栏位 '%s' 删除失败"
-
-#: ../admin.php:107
-#, php-format
-msgid "Setting Key '%s' has been deleted."
-msgstr "设定值 '%s' 已经被删除"
-
-#: ../admin.php:111
-#, php-format
-msgid "Error deleting Setting Key '%s'."
-msgstr "设定值 '%s' 删除失败"
-
-#: ../admin.php:136
-#: ../admin.php:296
-msgid "Uninstall WP-PostViews Plus"
-msgstr "停用 WP-PostViews Plus"
-
-#: ../admin.php:137
-#, php-format
-msgid "<a href=\"%s\">Click Here</a> To Finish The Uninstallation And WP-PostViews Plus Will Be Deactivated Automatically."
-msgstr "<a href=\"%s\">点击这里</a>来完成删除动作， WP-PostViews Plus 将会被自动停用。"
-
-#: ../admin.php:148
+#: ../class.wp-pvp.admin.php:122
 msgid "Post Views Plus Options"
 msgstr "Post Views Plus 设定"
 
-#: ../admin.php:151
+#: ../class.wp-pvp.admin.php:123
 msgid "Basic Options"
 msgstr "基本设定"
 
-#: ../admin.php:154
+#: ../class.wp-pvp.admin.php:126
 msgid "Count Views From:"
 msgstr "计数器动作："
 
-#: ../admin.php:157
+#: ../class.wp-pvp.admin.php:129
 msgid "Everyone"
 msgstr "所有人"
 
-#: ../admin.php:158
+#: ../class.wp-pvp.admin.php:130
 msgid "Guests Only"
 msgstr "只有访客"
 
-#: ../admin.php:159
+#: ../class.wp-pvp.admin.php:131
 msgid "Registered Users Only"
 msgstr "只有注册的使用者"
 
-#: ../admin.php:164
+#: ../class.wp-pvp.admin.php:136
 msgid "Reflash check:"
 msgstr "放灌水检查："
 
-#: ../admin.php:168
+#: ../class.wp-pvp.admin.php:139
 msgid "Close"
 msgstr "关闭"
 
-#: ../admin.php:169
+#: ../class.wp-pvp.admin.php:140
 msgid "Open"
 msgstr "开启"
 
-#: ../admin.php:171
+#: ../class.wp-pvp.admin.php:142
 msgid "Check is based on IP."
 msgstr "基于IP检查"
 
-#: ../admin.php:175
+#: ../class.wp-pvp.admin.php:143
 msgid "Reflash timeout:"
 msgstr "灌水检查时间："
 
-#: ../admin.php:177
+#: ../class.wp-pvp.admin.php:144
 msgid "second."
 msgstr "秒。"
 
-#: ../admin.php:182
+#: ../class.wp-pvp.admin.php:148 ../class.wp-pvp.widget.php:199
 msgid "Views Template:"
 msgstr "浏览器显示样板："
 
-#: ../admin.php:184
+#: ../class.wp-pvp.admin.php:150
 msgid "All views:"
 msgstr "所有浏览数："
 
-#: ../admin.php:187
-#: ../admin.php:194
-#: ../admin.php:201
-#: ../admin.php:210
+#: ../class.wp-pvp.admin.php:152 ../class.wp-pvp.admin.php:155
+#: ../class.wp-pvp.admin.php:158 ../class.wp-pvp.admin.php:165
+#: ../class.wp-pvp.widget.php:201
 msgid "Allowed Variables:"
 msgstr "允许的变量"
 
-#: ../admin.php:191
+#: ../class.wp-pvp.admin.php:153
 msgid "Only user views:"
 msgstr "只有使用者浏览数："
 
-#: ../admin.php:198
+#: ../class.wp-pvp.admin.php:156
 msgid "Only bot views:"
 msgstr "只有机器人浏览数："
 
-#: ../admin.php:206
+#: ../class.wp-pvp.admin.php:162
 msgid "Most Viewed Template:"
 msgstr "最多浏览的样板："
 
-#: ../admin.php:215
+#: ../class.wp-pvp.admin.php:166 ../class.wp-pvp.widget.php:209
+msgid "Size of post thumbnail: "
+msgstr ""
+
+#: ../class.wp-pvp.admin.php:166 ../class.wp-pvp.widget.php:210
+msgid "Width: "
+msgstr ""
+
+#: ../class.wp-pvp.admin.php:167 ../class.wp-pvp.widget.php:212
+msgid "Height: "
+msgstr ""
+
+#: ../class.wp-pvp.admin.php:171
 msgid "BOT User_agent:"
 msgstr "机器人的 User_agent"
 
-#: ../admin.php:219
+#: ../class.wp-pvp.admin.php:174
 msgid "For each BOT user_agent one line."
 msgstr "每一个 BOT User_agent 一行"
 
-#: ../admin.php:226
+#: ../class.wp-pvp.admin.php:179
 msgid "Display Options"
 msgstr "显示设定"
 
-#: ../admin.php:229
+#: ../class.wp-pvp.admin.php:182
 msgid "Home Page:"
 msgstr "首页："
 
-#: ../admin.php:232
-#: ../admin.php:243
-#: ../admin.php:253
-#: ../admin.php:263
-#: ../admin.php:273
-#: ../admin.php:283
+#: ../class.wp-pvp.admin.php:185 ../class.wp-pvp.admin.php:195
+#: ../class.wp-pvp.admin.php:205 ../class.wp-pvp.admin.php:215
+#: ../class.wp-pvp.admin.php:225 ../class.wp-pvp.admin.php:235
 msgid "Display to everyone"
 msgstr "显示给所有人"
 
-#: ../admin.php:233
-#: ../admin.php:244
-#: ../admin.php:254
-#: ../admin.php:264
-#: ../admin.php:274
-#: ../admin.php:284
+#: ../class.wp-pvp.admin.php:186 ../class.wp-pvp.admin.php:196
+#: ../class.wp-pvp.admin.php:206 ../class.wp-pvp.admin.php:216
+#: ../class.wp-pvp.admin.php:226 ../class.wp-pvp.admin.php:236
 msgid "Display to registered users only"
 msgstr "只显示给注册者"
 
-#: ../admin.php:234
+#: ../class.wp-pvp.admin.php:187
 msgid "Don't display on home page"
 msgstr "在首页不显示"
 
-#: ../admin.php:237
-msgid "These options specify where the view counts should be displayed and to whom.<br />Note that the theme files must contain a call to <code>the_views()</code> in order for any view count to be displayed."
-msgstr "这个选项让你可以针对指定版面决定是否显示浏览数<br />注意：主题样板中必须调用 <code>the_views()</code> 系列函数来显示浏览次数。"
-
-#: ../admin.php:240
+#: ../class.wp-pvp.admin.php:192
 msgid "Singe Posts:"
 msgstr "单篇文章："
 
-#: ../admin.php:245
+#: ../class.wp-pvp.admin.php:197
 msgid "Don't display on single posts"
 msgstr "不要再单篇文章页面显示"
 
-#: ../admin.php:250
+#: ../class.wp-pvp.admin.php:202
 msgid "Pages:"
 msgstr "独立分页："
 
-#: ../admin.php:255
+#: ../class.wp-pvp.admin.php:207
 msgid "Don't display on pages"
 msgstr "不要在独立页面显示"
 
-#: ../admin.php:260
+#: ../class.wp-pvp.admin.php:212
 msgid "Archive Pages:"
 msgstr "归档页面："
 
-#: ../admin.php:265
+#: ../class.wp-pvp.admin.php:217
 msgid "Don't display on archive pages"
 msgstr "不要在归档页面显示"
 
-#: ../admin.php:270
+#: ../class.wp-pvp.admin.php:222
 msgid "Search Pages:"
 msgstr "搜寻页面"
 
-#: ../admin.php:275
+#: ../class.wp-pvp.admin.php:227
 msgid "Don't display on search pages"
 msgstr "不要在搜寻页面显示"
 
-#: ../admin.php:280
+#: ../class.wp-pvp.admin.php:232
 msgid "Other Pages:"
 msgstr "其他页面："
 
-#: ../admin.php:285
+#: ../class.wp-pvp.admin.php:237
 msgid "Don't display on other pages"
 msgstr "不要在其他页面显示"
 
-#: ../admin.php:291
+#: ../class.wp-pvp.admin.php:242
+msgid ""
+"These options specify where the view counts should be displayed and to whom."
+"<br>Note that the theme files must contain a call to <code>the_views()</"
+"code> in order for any view count to be displayed."
+msgstr ""
+
+#: ../class.wp-pvp.admin.php:244
 msgid "Save Changes"
 msgstr "保存变更"
 
-#: ../admin.php:292
+#: ../class.wp-pvp.admin.php:245
 msgid "Reset to Default"
 msgstr "重置预设值"
 
-#: ../admin.php:297
-msgid "Deactivating WP-PostViews Plus plugin does not remove any data that may have been created, such as the views data. To completely remove this plugin, you can uninstall it here."
-msgstr "停用 WP-PostViews Plus 不会溢出任何由其建立的资料，例如浏览数。为了完整的移除，您可以从这里移除。"
+#: ../class.wp-pvp.admin.php:251
+msgid "Uninstall WP-PostViews Plus"
+msgstr "停用 WP-PostViews Plus"
 
-#: ../admin.php:298
+#: ../class.wp-pvp.admin.php:252
+msgid ""
+"Deactivating WP-PostViews Plus plugin does not remove any data that may have "
+"been created, such as the views data. To completely remove this plugin, you "
+"can uninstall it here."
+msgstr ""
+"停用 WP-PostViews Plus 不会溢出任何由其建立的资料，例如浏览数。为了完整的移"
+"除，您可以从这里移除。"
+
+#: ../class.wp-pvp.admin.php:254
 msgid "WARNING:"
 msgstr "注意："
 
-#: ../admin.php:298
-msgid "Once uninstalled, this cannot be undone. You should use a Database Backup plugin of WordPress to back up all the data first."
-msgstr "一旦删除之后，将无法复原。如果您想要保留资料请先行将 WordPress 的资料库备份"
+#: ../class.wp-pvp.admin.php:255
+msgid ""
+"Once uninstalled, this cannot be undone. You should use a Database Backup "
+"plugin of WordPress to back up all the data first."
+msgstr ""
+"一旦删除之后，将无法复原。如果您想要保留资料请先行将 WordPress 的资料库备份"
 
-#: ../admin.php:299
-#: ../admin.php:300
+#: ../class.wp-pvp.admin.php:257 ../class.wp-pvp.admin.php:258
 #, php-format
 msgid "The database table <strong>%s</strong> will be DELETED."
 msgstr "资料表 <strong>%s</strong> 将被删除"
 
-#: ../admin.php:301
+#: ../class.wp-pvp.admin.php:260
 msgid "The following WordPress Options/PostMetas will be DELETED:"
 msgstr "以下的 WordPress 设定与文章的自订栏位将被删除："
 
-#: ../admin.php:304
+#: ../class.wp-pvp.admin.php:261
 msgid "WordPress Options"
 msgstr "WordPress 设定值"
 
-#: ../admin.php:305
+#: ../class.wp-pvp.admin.php:267
 msgid "WordPress PostMetas"
 msgstr "文章自订栏位"
 
-#: ../admin.php:328
+#: ../class.wp-pvp.admin.php:275
 msgid "Yes"
 msgstr "是的"
 
-#: ../admin.php:329
-msgid ""
-"You Are About To Uninstall WP-PostViews Plus From WordPress.\\n"
-"This Action Is Not Reversible.\\n"
-"\\n"
-" Choose [Cancel] To Stop, [OK] To Uninstall."
-msgstr ""
-"您将从 WordPress 删除 WP-PostViews Plus \\n"
-"此动作是不可逆转的。\\n"
-"\\n"
-"点选 [取消] 来终止删除， [确定]执行删除"
+#: ../class.wp-pvp.admin.php:276
+msgid "UNINSTALL WP-PostViews Plus"
+msgstr "停用 WP-PostViews Plus"
 
-#: ../admin.php:332
+#: ../class.wp-pvp.admin.php:276
+msgid ""
+"You Are About To Uninstall WP-PostViews Plus From WordPress.\\nThis Action "
+"Is Not Reversible.\\n\\n Choose [Cancel] To Stop, [OK] To Uninstall."
+msgstr ""
+"您将从 WordPress 删除 WP-PostViews Plus \\n此动作是不可逆转的。\\n\\n点选 [取"
+"消] 来终止删除， [确定]执行删除"
+
+#: ../class.wp-pvp.admin.php:280
 msgid "Thank"
 msgstr "感谢"
 
-#: ../admin.php:333
+#: ../class.wp-pvp.admin.php:281
 msgid "Translation contributors"
 msgstr "翻译贡献者"
 
-#: ../postviews_plus.php:326
-msgid "There is no excerpt because this is a protected post."
-msgstr "文章首密码保护，无法产生摘要。"
-
-#: ../postviews_plus.php:392
-msgid "N/A"
-msgstr "沒有文章"
-
-#: ../widget.php:15
+#: ../class.wp-pvp.widget.php:24
 msgid "WP-PostViews plus views statistics"
 msgstr "WP-PostViews plus 的浏览排行"
 
-#: ../widget.php:16
+#: ../class.wp-pvp.widget.php:25
 msgid "Views Stats"
 msgstr "浏览数排行"
 
-#: ../widget.php:79
+#: ../class.wp-pvp.widget.php:129
 msgid "Views"
 msgstr "浏览数"
 
-#: ../widget.php:93
+#: ../class.wp-pvp.widget.php:158
 msgid "Title:"
 msgstr "标题："
 
-#: ../widget.php:97
+#: ../class.wp-pvp.widget.php:162
 msgid "Statistics Type:"
 msgstr "排行方式："
 
-#: ../widget.php:99
-#: ../widget.php:111
+#: ../class.wp-pvp.widget.php:164
 msgid "Most Viewed"
 msgstr "最多浏览人数"
 
-#: ../widget.php:100
+#: ../class.wp-pvp.widget.php:165
 msgid "Most Viewed By Category"
 msgstr "以分类最多人浏览"
 
-#: ../widget.php:101
+#: ../class.wp-pvp.widget.php:166
 msgid "Most Viewed By Tag"
 msgstr "依标签最多人浏览"
 
-#: ../widget.php:105
+#: ../class.wp-pvp.widget.php:170
 msgid "Include Views From:"
 msgstr "包含的页面形式："
 
-#: ../widget.php:107
+#: ../class.wp-pvp.widget.php:172
 msgid "Posts &amp; Pages"
 msgstr "文章 &amp; 分页"
 
-#: ../widget.php:108
+#: ../class.wp-pvp.widget.php:173
 msgid "Posts Only"
 msgstr "只有文章"
 
-#: ../widget.php:109
+#: ../class.wp-pvp.widget.php:174
 msgid "Pages Only"
 msgstr "只有分页"
 
-#: ../widget.php:111
-msgid "Only work with "
-msgstr "只作用于"
-
-#: ../widget.php:114
+#: ../class.wp-pvp.widget.php:178
 msgid "Category IDs:"
 msgstr "分类 ID："
 
-#: ../widget.php:124
-#: ../widget.php:129
+#: ../class.wp-pvp.widget.php:191 ../class.wp-pvp.widget.php:196
 msgid "Seperate mutiple categories with commas."
 msgstr "多个分类以 ',' 区分"
 
-#: ../widget.php:127
+#: ../class.wp-pvp.widget.php:194
 msgid "Tag IDs:"
 msgstr "标签 ID："
 
-#: ../widget.php:132
+#: ../class.wp-pvp.widget.php:204
 msgid "No. Of Records To Show:"
 msgstr "显示的文章数量："
 
-#: ../widget.php:135
+#: ../class.wp-pvp.widget.php:206
 msgid "Maximum Post Title Length (Characters):"
 msgstr "最多标题字数："
 
-#: ../widget.php:136
+#: ../class.wp-pvp.widget.php:208
 msgid "<strong>0</strong> to disable."
 msgstr "<strong>0</strong> 不限制"
 
-#: ../widget.php:136
+#: ../class.wp-pvp.widget.php:208
 msgid " Chinese characters to calculate the two words!"
 msgstr "中文字计算为2字数"
 
-#: ../widget.php:139
+#: ../class.wp-pvp.widget.php:216
 msgid "With BOT Views:"
 msgstr "包含机器人的浏览："
 
-#: ../widget.php:141
+#: ../class.wp-pvp.widget.php:218
 msgid "With BOT"
 msgstr "包含机器人"
 
-#: ../widget.php:142
+#: ../class.wp-pvp.widget.php:219
 msgid "Without BOT"
 msgstr "不包含机器人"
+
+#: ../wp-postviews-plus.php:184
+msgid "There is no excerpt because this is a protected post."
+msgstr "文章首密码保护，无法产生摘要。"
+
+#: ../wp-postviews-plus.php:269
+msgid "N/A"
+msgstr "沒有文章"
+
+#~ msgid "views"
+#~ msgstr "浏览数"
+
+#~ msgid "user views"
+#~ msgstr "使用者浏览数"
+
+#~ msgid "bot views"
+#~ msgstr "机器人浏览数"
+
+#~ msgid "Post Meta Key '%s' has been deleted."
+#~ msgstr "文章自订栏位 '%s' 已经被删除"
+
+#~ msgid "Error deleting Post Meta Key '%s'."
+#~ msgstr "文章自订栏位 '%s' 删除失败"
+
+#~ msgid "Setting Key '%s' has been deleted."
+#~ msgstr "设定值 '%s' 已经被删除"
+
+#~ msgid "Error deleting Setting Key '%s'."
+#~ msgstr "设定值 '%s' 删除失败"
+
+#~ msgid ""
+#~ "<a href=\"%s\">Click Here</a> To Finish The Uninstallation And WP-"
+#~ "PostViews Plus Will Be Deactivated Automatically."
+#~ msgstr ""
+#~ "<a href=\"%s\">点击这里</a>来完成删除动作， WP-PostViews Plus 将会被自动停"
+#~ "用。"
+
+#~ msgid ""
+#~ "These options specify where the view counts should be displayed and to "
+#~ "whom.<br />Note that the theme files must contain a call to "
+#~ "<code>the_views()</code> in order for any view count to be displayed."
+#~ msgstr ""
+#~ "这个选项让你可以针对指定版面决定是否显示浏览数<br />注意：主题样板中必须调"
+#~ "用 <code>the_views()</code> 系列函数来显示浏览次数。"
+
+#~ msgid "Only work with "
+#~ msgstr "只作用于"
 
 #~ msgid ""
 #~ "* If you are not using any category or tag statistics, you can ignore it."
