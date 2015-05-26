@@ -23,13 +23,15 @@ class WP_PVP_ajax {
 		$data = $wpdb->get_row('SELECT * FROM ' . $wpdb->postviews_plus . ' WHERE count_id = "' . esc_attr($_GET['count_id']) . '"');
 		if( $data ) {
 			if( !empty($data->tv) ) {
-				$views = $wpdb->get_results('SELECT pmu.post_id, IFNULL(pmu.meta_value, 0) AS user_views, IFNULL(pmb.meta_value, 0) AS bot_views FROM ' . $wpdb->postmeta . ' AS pmu'
-					. ' LEFT JOIN ' . $wpdb->postmeta . ' AS pmb ON pmb.post_id = pmu.post_id AND pmb.meta_key = "' . WP_PVP::$post_meta_botviews . '"'
-					. ' WHERE pmu.meta_key ="' . WP_PVP::$post_meta_views . '" AND pmu.post_id IN (' . $data->tv . ')');
-				foreach( $views AS $view ) {
-					$json['wppvp_tv_' . $view->post_id] = number_format_i18n($view->user_views + $view->bot_views);
-					$json['wppvp_tuv_' . $view->post_id] = number_format_i18n($view->user_views);
-					$json['wppvp_tbv_' . $view->post_id] = number_format_i18n($view->bot_views);
+				$post_list = explode(',', $data->tv);
+				if( is_array($post_list) ) {
+					foreach( $post_list as $post_ID ) {
+						$user_views = (int) get_post_meta($post_ID, WP_PVP::$post_meta_views, true);
+						$bot_views = (int) get_post_meta($post_ID, WP_PVP::$post_meta_botviews, true);
+						$json['wppvp_tv_' . $post_ID] = number_format_i18n($user_views + $bot_views);
+						$json['wppvp_tuv_' . $post_ID] = number_format_i18n($user_views);
+						$json['wppvp_tbv_' . $post_ID] = number_format_i18n($bot_views);
+					}
 				}
 			}
 			if( !empty($data->gt) ) {

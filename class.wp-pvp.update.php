@@ -15,8 +15,8 @@ class WP_PVP_update {
 		if( version_compare($now_version, '2.0.0', '<' ) ) {
 			update_option('PVP_version', '2.0.0');
 		}
-	}
-
-	private static function update_1_0_0() {
+		if( version_compare($now_version, '2.0.1', '<' ) ) {
+			update_option('PVP_version', '2.0.1');
+		}
 	}
 }

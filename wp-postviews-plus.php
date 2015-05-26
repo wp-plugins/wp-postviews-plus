@@ -3,7 +3,7 @@
 Plugin Name: WP-PostViews Plus
 Plugin URI: http://wwpteach.com/wp-postviews-plus
 Description: Enables You To Display How Many Times A Post Had Been Viewed By User Or Bot.
-Version: 2.0.0
+Version: 2.0.1
 Author: Richer Yang
 Author URI: http://fantasyworld.idv.tw/
 Text Domain: wp-postviews-plus
@@ -12,7 +12,7 @@ Domain Path: /languages
 
 function_exists('plugin_dir_url') OR exit('No direct script access allowed');
 
-define('WP_PVP_VERSION', '2.0.0');
+define('WP_PVP_VERSION', '2.0.1');
 define('WP_PVP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_PVP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_PVP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -35,14 +35,7 @@ function the_views($text_views = null, $display = true, $always = false) {
 
 		$post_views = intval(get_post_meta($post->ID, WP_PVP::$post_meta_views, true)) + intval(get_post_meta($post->ID, WP_PVP::$post_meta_botviews, true));
 		if( $display ) {
-			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tv_' . $post->ID . '">%VIEW_COUNT%</span>', WP_PVP::$options['template']);
-			if( defined('WP_CACHE') && WP_CACHE ) {
-				WP_PVP::add_cache_stats('tv', $post->ID);
-				$template = str_replace('%VIEW_COUNT%', '', $template);
-			} else {
-				$template = str_replace('%VIEW_COUNT%', number_format_i18n($post_views), $template);
-			}
-			echo($template);
+			echo(wp_pvp_count_replace(WP_PVP::$options['template'], 'both', $post->ID, $post_views));
 		} else {
 			return $post_views;
 		}
@@ -56,14 +49,7 @@ function the_user_views($text_views = null, $display = true, $always = false) {
 
 		$post_views = intval(get_post_meta($post->ID, WP_PVP::$post_meta_views, true));
 		if( $display ) {
-			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tuv_' . $post->ID . '">%VIEW_COUNT%</span>', WP_PVP::$options['user_template']);
-			if( defined('WP_CACHE') && WP_CACHE ) {
-				WP_PVP::add_cache_stats('tv', $post->ID);
-				$template = str_replace('%VIEW_COUNT%', '', $template);
-			} else {
-				$template = str_replace('%VIEW_COUNT%', number_format_i18n($post_views), $template);
-			}
-			echo($template);
+			echo(wp_pvp_count_replace(WP_PVP::$options['user_template'], 'user', $post->ID, $post_views));
 		} else {
 			return $post_views;
 		}
@@ -75,21 +61,36 @@ function the_bot_views($text_views = null, $display = true, $always = false) {
 	if( $always || WP_PVP::should_views_display() ) {
 		global $post;
 
-		$post_views = intval(get_post_meta($post->ID, WP_PVP::$post_meta_botviews, true));
+		$post_views = (int) get_post_meta($post->ID, WP_PVP::$post_meta_botviews, true);
 		if( $display ) {
-			$template = str_replace('%VIEW_COUNT%', '<span id="wppvp_tbv_' . $post->ID . '">%VIEW_COUNT%</span>', WP_PVP::$options['bot_template']);
-			if( defined('WP_CACHE') && WP_CACHE ) {
-				WP_PVP::add_cache_stats('tv', $post->ID);
-				$template = str_replace('%VIEW_COUNT%', '', $template);
-			} else {
-				$template = str_replace('%VIEW_COUNT%', number_format_i18n($post_views), $template);
-			}
-			echo($template);
+			echo(wp_pvp_count_replace(WP_PVP::$options['bot_template'], 'bot', $post->ID, $post_views));
 		} else {
 			return $post_views;
 		}
 	}
 	return false;
+}
+
+function wp_pvp_count_replace($template, $type, $post_ID, $post_views) {
+	if( defined('WP_CACHE') && WP_CACHE ) {
+		WP_PVP::add_cache_stats('tv', $post_ID);
+		switch( $type ) {
+			case 'user':
+				$template = str_replace('%VIEW_COUNT%', '<span class="wppvp_tuv_' . $post_ID . '">%VIEW_COUNT%</span>', $template);
+				break;
+			case 'bot':
+				$template = str_replace('%VIEW_COUNT%', '<span class="wppvp_tbv_' . $post_ID . '">%VIEW_COUNT%</span>', $template);
+				break;
+			case 'both':
+			default:
+				$template = str_replace('%VIEW_COUNT%', '<span class="wppvp_tv_' . $post_ID . '">%VIEW_COUNT%</span>', $template);
+				break;
+		}
+		$template = str_replace('%VIEW_COUNT%', '', $template);
+	} else {
+		$template = str_replace('%VIEW_COUNT%', number_format_i18n($post_views), $template);
+	}
+	return $template;
 }
 
 function get_totalviews_term($term_id = 1, $display = true, $with_bot = true, $type = '') {
@@ -191,7 +192,7 @@ function views_post_excerpt($post_excerpt, $post_content, $post_password, $chars
 	}
 }
 
-function my_str_replace($template, $post, $chars, $thumbnail_width, $thumbnail_height) {
+function wp_pvp_template_replace($template, $post, $chars, $thumbnail_width, $thumbnail_height, $with_bot) {
 	$post_views = intval($post->views);
 	$post_title = isset($post->post_title) ? $post->post_title : '';
 	if( $chars > 0 ) {
@@ -214,7 +215,7 @@ function my_str_replace($template, $post, $chars, $thumbnail_width, $thumbnail_h
 	}
 	$post_excerpt = views_post_excerpt($post->post_excerpt, $post->post_content, $post->post_password, $chars);
 	$temp = stripslashes($template);
-	$temp = str_replace("%VIEW_COUNT%", number_format_i18n($post_views), $temp);
+	$temp = wp_pvp_count_replace($temp, ($with_bot ? 'both' : 'user'), $post->ID, $post_views);
 	$temp = str_replace("%POST_TITLE%", $post_title, $temp);
 	$temp = str_replace("%POST_EXCERPT%", $post_excerpt, $temp);
 	$temp = str_replace("%POST_CONTENT%", $post->post_content, $temp);
@@ -256,14 +257,17 @@ function get_timespan_most_viewed_term($term_id = 1, $mode = null, $limit = 10, 
 		$where .= ' AND (left(p.post_date, 10) > "' . $limit_date . '" OR left(p.post_modified, 10) > "' . $limit_date . '")';
 	}
 
-	$most_viewed = $wpdb->get_results('SELECT DISTINCT p.ID, p.post_title, p.post_excerpt, p.post_content, post_password, p.post_date, ' . $views . ' AS views FROM ' . $wpdb->posts . ' AS p ' . $left_join . $inner_join . ' WHERE p.post_date<"' . current_time('mysql') . '" AND ' . $where . '  AND p.post_status="publish" AND p.post_password="" ORDER BY views DESC LIMIT ' . $limit);
+	$most_viewed = $wpdb->get_results('SELECT DISTINCT p.ID, p.post_title, p.post_excerpt, p.post_content, post_password, p.post_date, ' . $views . ' AS views'
+		. ' FROM ' . $wpdb->posts . ' AS p ' . $left_join . $inner_join
+		. ' WHERE p.post_date<"' . current_time('mysql') . '" AND ' . $where . '  AND p.post_status="publish" AND p.post_password=""'
+		. ' ORDER BY views DESC LIMIT ' . $limit);
 
 	if( $most_viewed ) {
 		if( empty($template) ) {
 			$template = WP_PVP::$options['most_viewed_template'];
 		}
 		foreach( $most_viewed as $post ) {
-			$output .= my_str_replace($template, $post, $chars, $thumbnail_width, $thumbnail_height) . "\n";
+			$output .= wp_pvp_template_replace($template, $post, $chars, $thumbnail_width, $thumbnail_height, $with_bot) . "\n";
 		}
 	} else {
 		$output = '<li>' . __('N/A', 'wp-postviews-plus') . '</li>' . "\n";
