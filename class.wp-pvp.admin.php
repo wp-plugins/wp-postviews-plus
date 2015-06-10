@@ -32,7 +32,7 @@ class WP_PVP_admin {
 	}
 
 	public static function admin_menu() {
-		add_options_page('WP-PostViews Plus', __('PostViews+', WP_PVP::$textdomain), 'manage_options', 'postviews_plus', array('WP_PVP_admin', 'setting'));
+		add_options_page('WP-PostViews Plus', __('PostViews+', WP_PVP::$textdomain), 'manage_options', 'wp_postviews_plus', array('WP_PVP_admin', 'setting'));
 	}
 
 	private static function update_setting() {
